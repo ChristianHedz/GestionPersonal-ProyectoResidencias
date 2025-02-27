@@ -1,6 +1,6 @@
-<div class="grid h-screen m-0 p-0">
+<div class="grid h-screen m-0 p-0 overflow-hidden bp">
     <!-- Panel de registro (parte izquierda) -->
-    <div class="col-12 md:col-6 flex align-items-center justify-content-center bp" >
+    <div class="col-12 md:col-6 flex align-items-center justify-content-center " >
       <!-- Contenido del formulario -->
       <div class="flex flex-column align-items-center w-full max-w-30rem z-2 p-3 ">
   
@@ -20,14 +20,14 @@
           
           <div class="mb-1">
             <mat-form-field appearance="fill" class="w-full bw" >
-              <mat-label>Ingresa tu número de teléfono</mat-label>
+              <mat-label>Ingresa tu teléfono</mat-label>
               <input matInput type="tel">
             </mat-form-field>
           </div>
           
           <div class="mb-1">
             <mat-form-field appearance="fill" class="w-full bw" >
-              <mat-label>Ejemplomail.com</mat-label>
+              <mat-label>Ingresa tu Correo</mat-label>
               <input matInput type="email">
             </mat-form-field>
           </div>
@@ -76,9 +76,9 @@
     </div>
     
     <!-- Imagen del pastel (parte derecha) -->
-    <div class="col-12 md:col-6 hidden md:block p-0">
-      <div class="h-full">
-        <img src="assets/img/fd1.jpg" alt="Paste chocolate con frutos rojos" class="">
+    <div class="col-12 md:col-6 hidden md:block p-8 h-full img-z">
+      <div class="h-full border-1 border-300 border-round-xl overflow-hidden">
+        <img src="assets/img/logo.webp" alt="Pastel de chocolate con frutos rojos" class="w-full h-full object-cover">
       </div>
     </div>
   </div>
