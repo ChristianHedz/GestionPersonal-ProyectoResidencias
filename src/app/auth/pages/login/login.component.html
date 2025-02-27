@@ -1,0 +1,85 @@
+<div class="grid h-screen m-0 p-0">
+    <!-- Panel de registro (parte izquierda) -->
+    <div class="col-12 md:col-6 flex align-items-center justify-content-center bp" >
+      <!-- Contenido del formulario -->
+      <div class="flex flex-column align-items-center w-full max-w-30rem z-2 p-3 ">
+  
+        <!-- Texto de bienvenida -->
+        <div class="text-center mb-3">
+          <h2 class="m-0 text-2xl">Bienvenido <span style="color: #ffc107;">👋</span></h2>
+        </div>
+        
+        <!-- Formulario -->
+        <form class="w-full">
+          <div class="mb-1">
+            <mat-form-field appearance="fill" class="w-full bw" >
+              <mat-label>Ingresa tu nombre</mat-label>
+              <input matInput type="text">
+            </mat-form-field>
+          </div>
+          
+          <div class="mb-1">
+            <mat-form-field appearance="fill" class="w-full bw" >
+              <mat-label>Ingresa tu número de teléfono</mat-label>
+              <input matInput type="tel">
+            </mat-form-field>
+          </div>
+          
+          <div class="mb-1">
+            <mat-form-field appearance="fill" class="w-full bw" >
+              <mat-label>Ejemplomail.com</mat-label>
+              <input matInput type="email">
+            </mat-form-field>
+          </div>
+          
+          <div class="mb-1">
+            <mat-form-field appearance="fill" class="w-full bw" >
+              <mat-label>Al least 8 characters</mat-label>
+              <input matInput type="password">
+            </mat-form-field>
+          </div>
+          
+          <button mat-raised-button color="primary" class="w-full p-2 mb-2">Registrarse</button>
+          
+          <!-- Separador "o" -->
+          <div class="flex align-items-center justify-content-center mb-2 w-full">
+            <div class="surface-border border-1 border-top-1 border-300 flex-grow-1"></div>
+            <div class="px-2 text-white font-light text-xs">o</div>
+            <div class="surface-border border-1 border-top-1 border-300 flex-grow-1"></div>
+          </div>
+                  
+          <!-- Botones de inicio de sesión con redes sociales -->
+          <div class="mb-1 w-full">
+            <button mat-stroked-button class="w-full p-1 mb-1 bg-white text-sm">
+              <div class="flex align-items-center justify-content-center">
+                <img src="https://cdn.jsdelivr.net/npm/simple-icons@v6/icons/google.svg" width="16" height="16" class="mr-2" alt="Google icon">
+                <span>Ingresar con Google</span>
+              </div>
+            </button>
+          </div>
+          
+          <div class="mb-2 w-full">
+            <button mat-stroked-button class="w-full p-1 mb-1 bg-white text-sm">
+              <div class="flex align-items-center justify-content-center">
+                <img src="https://cdn.jsdelivr.net/npm/simple-icons@v6/icons/facebook.svg" width="16" height="16" class="mr-2" alt="Facebook icon">
+                <span>Ingresar con Facebook</span>
+              </div>
+            </button>
+          </div>
+          
+          <!-- Enlace para iniciar sesión -->
+          <div class="text-center text-white text-xs">
+            ¿Ya estás registrado? <a href="#" class="text-blue-400">Inicia sesión</a>
+          </div>
+        </form>
+      </div>
+    </div>
+    
+    <!-- Imagen del pastel (parte derecha) -->
+    <div class="col-12 md:col-6 hidden md:block p-0">
+      <div class="h-full">
+        <img src="assets/img/fd1.jpg" alt="Paste chocolate con frutos rojos" class="">
+      </div>
+    </div>
+  </div>
+  

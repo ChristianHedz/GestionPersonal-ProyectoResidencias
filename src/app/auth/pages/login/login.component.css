@@ -1,0 +1,103 @@
+.text-dark {
+    color: #333;
+  }
+  
+  
+  .bp {
+    background: linear-gradient(135deg, #43a047 0%, #1b5e20 50%, #004d40 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .bp::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(76, 175, 80, 0.3) 0%, rgba(27, 94, 32, 0.1) 50%, rgba(0, 77, 64, 0) 70%);
+    animation: rotate 20s linear infinite;
+    z-index: 1;
+  }
+  
+  .bp::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(0, 200, 83, 0.1) 0%, rgba(29, 233, 182, 0.1) 100%);
+    z-index: 1;
+  }
+  
+  @keyframes rotate {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  /* Estilos para los campos de formulario con fondo blanco */
+  /* .bw {
+    --mdc-filled-text-field-container-color: white;
+    --mdc-filled-text-field-label-text-color: #333;
+    --mdc-filled-text-field-input-text-color: #000;
+    border-radius: 8px;
+    overflow: hidden;
+  } */
+  .text-dark {
+    color: #333;
+  }
+  
+  
+  .bp {
+    background: linear-gradient(135deg, #43a047 0%, #1b5e20 50%, #004d40 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .bp::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(76, 175, 80, 0.3) 0%, rgba(27, 94, 32, 0.1) 50%, rgba(0, 77, 64, 0) 70%);
+    animation: rotate 20s linear infinite;
+    z-index: 1;
+  }
+  
+  .bp::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(0, 200, 83, 0.1) 0%, rgba(29, 233, 182, 0.1) 100%);
+    z-index: 1;
+  }
+  
+  @keyframes rotate {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  /* Estilos para los campos de formulario con fondo blanco */
+  /* .bw {
+    --mdc-filled-text-field-container-color: white;
+    --mdc-filled-text-field-label-text-color: #333;
+    --mdc-filled-text-field-input-text-color: #000;
+    border-radius: 8px;
+    overflow: hidden;
+  } */
+    
