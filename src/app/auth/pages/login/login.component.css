@@ -10,15 +10,6 @@
   padding: 8px;
 }
 
-/* Estilos para los campos de formulario con fondo blanco */
-/* .bw {
-  --mdc-filled-text-field-container-color: white;
-  --mdc-filled-text-field-label-text-color: #333;
-  --mdc-filled-text-field-input-text-color: #000;
-  border-radius: 8px;
-  overflow: hidden;
-} */
-
 .bp {
   background: linear-gradient(135deg, #004d40 0%, #00695c 50%, #004d40 100%);
   position: relative;

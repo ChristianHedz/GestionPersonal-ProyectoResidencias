@@ -11,19 +11,6 @@
         
         <!-- Formulario -->
         <form class="w-full">
-          <div class="mb-1">
-            <mat-form-field appearance="fill" class="w-full bw" >
-              <mat-label>Ingresa tu nombre</mat-label>
-              <input matInput type="text">
-            </mat-form-field>
-          </div>
-          
-          <div class="mb-1">
-            <mat-form-field appearance="fill" class="w-full bw" >
-              <mat-label>Ingresa tu teléfono</mat-label>
-              <input matInput type="tel">
-            </mat-form-field>
-          </div>
           
           <div class="mb-1">
             <mat-form-field appearance="fill" class="w-full bw" >
@@ -34,12 +21,12 @@
           
           <div class="mb-1">
             <mat-form-field appearance="fill" class="w-full bw" >
-              <mat-label>Al least 8 characters</mat-label>
+              <mat-label>Ingresa tu contraseña</mat-label>
               <input matInput type="password">
             </mat-form-field>
           </div>
           
-          <button mat-raised-button color="primary" class="w-full p-2 mb-2">Registrarse</button>
+          <button mat-raised-button color="primary" class="w-full p-2 mb-2">Iniciar Sesion</button>
           
           <!-- Separador "o" -->
           <div class="flex align-items-center justify-content-center mb-2 w-full">
@@ -69,7 +56,7 @@
           
           <!-- Enlace para iniciar sesión -->
           <div class="text-center text-white text-xs">
-            ¿Ya estás registrado? <a href="#" class="text-blue-400">Inicia sesión</a>
+            ¿Aún no tienes cuenta? <a routerLink="/registro" class="text-blue-400">Regístrate aquí</a>
           </div>
         </form>
       </div>
