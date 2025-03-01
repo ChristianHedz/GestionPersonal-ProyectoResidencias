@@ -9,7 +9,7 @@ import { RouterModule } from '@angular/router';
 @Component({
   selector: 'app-register',
   imports: [ReactiveFormsModule,MatFormFieldModule,MatInputModule,
-            MatButtonModule,MatIconModule,MatButtonModule,RouterModule],
+      MatButtonModule,MatIconModule,MatButtonModule,RouterModule],
   templateUrl: './register.component.html',
   styleUrl: './register.component.css'
 })

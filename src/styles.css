@@ -7,3 +7,17 @@ body {
   font-weight: 400;
   font-style: static;
 }
+
+.zindex{
+  z-index: 2;
+}
+
+/* Estilos para los campos de formulario con fondo blanco */
+/* .bw {
+  --mdc-filled-text-field-container-color: white;
+  --mdc-filled-text-field-label-text-color: #333;
+  --mdc-filled-text-field-input-text-color: #000;
+  border-radius: 8px;
+  overflow: hidden;
+} */
+

@@ -1,0 +1,107 @@
+<!-- app.component.html -->
+<div class="flex flex-column h-screen">
+    <!-- Toolbar -->
+    <!-- app.component.html -->
+    <div class="flex flex-column h-screen">
+        <!-- Toolbar -->
+        <mat-toolbar class="flex justify-content-between zindex toolbar-gradient">
+          <div class="flex align-items-center">
+            <button mat-icon-button [matMenuTriggerFor]="menu">
+              <mat-icon>menu</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu">
+              <button mat-menu-item>
+                <mat-icon>home</mat-icon>
+                <span>Inicio</span>
+              </button>
+              <button mat-menu-item>
+                <mat-icon>person</mat-icon>
+                <span>Empleados</span>
+              </button>
+              <button mat-menu-item>
+                <mat-icon>payments</mat-icon>
+                <span>Nómina</span>
+              </button>
+              <button mat-menu-item>
+                <mat-icon>schedule</mat-icon>
+                <span>Control Asistencia</span>
+              </button>
+              <button mat-menu-item>
+                <mat-icon>bar_chart</mat-icon>
+                <span>Gráficas</span>
+              </button>
+              <button mat-menu-item>
+                <mat-icon>chat</mat-icon>
+                <span>Chatbot</span>
+              </button>
+              <button mat-menu-item>
+                <mat-icon>settings</mat-icon>
+                <span>Configuración</span>
+              </button>
+            </mat-menu>
+          </div>
+          <span>Ch13</span>
+        </mat-toolbar>
+        
+        <!-- ...existing code... -->
+  
+    <!-- Content Area -->
+    <div class="flex-1 overflow-y-auto p-4">
+      <div class="grid">
+        <!-- Left Column - Time and User Info -->
+        <div class="col-12 md:col-6">
+          <div class="p-d-flex p-flex-column p-align-center p-text-center">
+            <!-- Time Display -->
+            <div class="time-display text-center ">
+              <h1 class="text-5xl font-light mb-0 mt-2">09:12</h1>
+              <h3 class="font-light text-600 mt-0">Miércoles, Dic 12</h3>
+            </div>
+            
+            <!-- User Icon -->
+            <div class="flex justify-content-center my-4 p-mt-4">
+              <div class="w-8rem h-8rem">
+                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="50" cy="50" r="45" fill="#C0C0C0" />
+                  <polygon points="50,20 80,70 20,70" fill="#808080" />
+                  <path d="M50,50 L20,50 A30,30 0 0,0 50,80 Z" fill="#808080" />
+                </svg>
+              </div>
+            </div>
+  
+            <!-- Repeated "Frozen Yogurt" Labels -->
+            <div class="mt-3 text-center">
+              <span class="label-text">Frozen Yogurt</span>
+            </div>
+            <div class="mt-4 text-center">
+              <span class="label-text">Frozen Yogurt</span>
+            </div>
+            <div class="mt-4 text-center">
+              <span class="label-text">Frozen Yogurt</span>
+            </div>
+            
+            <!-- Primary Button -->
+            <div class="p-mt-4 text-center mt-5">
+              <button mat-raised-button color="primary">PRIMARY</button>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Right Column - Employee List -->
+        <div class="col-12 md:col-6">
+          <div class="p-mt-4 md:p-mt-0">
+            <div class="employee-list-container">
+              <h4 class="text-sm font-medium m-0 text-center">LISTA DE EMPLEADOS</h4>
+              
+              <!-- Checkboxes -->
+              <div class="p-mt-4">
+                <mat-checkbox [checked]="false">Label</mat-checkbox>
+              </div>
+              <div class="p-mt-2">
+                <mat-checkbox [checked]="true">Label</mat-checkbox>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
