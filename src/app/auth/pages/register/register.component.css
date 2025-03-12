@@ -7,11 +7,12 @@
 }
 
 .bp {
-  background: -webkit-linear-gradient(90deg, #000000,#08002e,#000242,#020061,#ad0000);
-  background: linear-gradient(90deg, #000000,#08002e,#000242,#020061,#ad0000);
+  background: -webkit-linear-gradient(90deg, #50fda5,#00d9ff,#d085f2);
+  background: linear-gradient(90deg, #50fda5,#00d9ff,#d085f2);
   position: relative;
   overflow: hidden;
 }
+
 
 /* Primera capa - patrones hexagonales */
 .bp::before {

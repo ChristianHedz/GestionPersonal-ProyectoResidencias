@@ -10,36 +10,34 @@
         </div>
         
         <!-- Formulario -->
-        <form class="w-full">
+        <form class="w-full" [formGroup]="registerForm">
           <div class="mb-1">
-            <mat-form-field appearance="fill" class="w-full bw" >
-              <mat-label>Ingresa tu usuario</mat-label>
-              <input matInput type="text">
+            <mat-form-field appearance="fill" class="w-full bw">
+              <mat-label>Ingresa tu nombre completo</mat-label>
+              <input matInput type="text" formControlName="fullname">
+              <mat-error *ngIf="fullname().errors">{{ getFieldError('fullname') }}</mat-error>
             </mat-form-field>
           </div>
           
           <div class="mb-1">
-            <mat-form-field appearance="fill" class="w-full bw" >
-              <mat-label>Ingresa tu teléfono</mat-label>
-              <input matInput type="tel">
-            </mat-form-field>
-          </div>
-          
-          <div class="mb-1">
-            <mat-form-field appearance="fill" class="w-full bw" >
+            <mat-form-field appearance="fill" class="w-full bw">
               <mat-label>Ingresa tu Correo</mat-label>
-              <input matInput type="email">
+              <input matInput type="email" formControlName="email">
+              <mat-error *ngIf="email().errors">{{ getFieldError('email') }}</mat-error>
             </mat-form-field>
           </div>
           
           <div class="mb-1">
-            <mat-form-field appearance="fill" class="w-full bw" >
+            <mat-form-field appearance="fill" class="w-full bw">
               <mat-label>Ingresa tu contraseña</mat-label>
-              <input matInput type="password">
+              <input matInput type="password" formControlName="password">
+              <mat-error *ngIf="password().errors">{{ getFieldError('password') }}</mat-error>
             </mat-form-field>
           </div>
           
-          <button mat-raised-button color="primary" class="w-full p-2 mb-2">Registrarse</button>
+          <button mat-raised-button color="primary" class="w-full p-2 mb-2" (click)="register()">
+            Registrarse
+          </button>
           
           <!-- Separador "o" -->
           <div class="flex align-items-center justify-content-center mb-2 w-full">

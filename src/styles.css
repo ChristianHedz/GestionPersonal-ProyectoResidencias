@@ -12,6 +12,13 @@ body {
   z-index: 2;
 }
 
+.mat-mdc-form-field-error {
+  color: #ee0505 !important;
+  font-weight: 500 !important;
+  opacity: 1 !important;
+}
+
+
 /* Estilos para los campos de formulario con fondo blanco */
 /* .bw {
   --mdc-filled-text-field-container-color: white;
