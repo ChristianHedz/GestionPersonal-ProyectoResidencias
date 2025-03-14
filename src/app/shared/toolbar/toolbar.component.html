@@ -1,0 +1,38 @@
+<mat-toolbar class="flex justify-content-between zindex toolbar-gradient">
+    <div class="flex align-items-center">
+      <button mat-icon-button [matMenuTriggerFor]="menu">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <mat-menu #menu="matMenu">
+        <button mat-menu-item routerLink="/inicio">
+          <mat-icon >home</mat-icon>
+          <span>Inicio</span>
+        </button>
+        <button mat-menu-item routerLink="/info">
+          <mat-icon>person</mat-icon>
+          <span>Empleados</span>
+        </button>
+        <button mat-menu-item>
+          <mat-icon>payments</mat-icon>
+          <span>Nómina</span>
+        </button>
+        <button mat-menu-item>
+          <mat-icon>schedule</mat-icon>
+          <span>Control Asistencia</span>
+        </button>
+        <button mat-menu-item>
+          <mat-icon>bar_chart</mat-icon>
+          <span>Gráficas</span>
+        </button>
+        <button mat-menu-item>
+          <mat-icon>chat</mat-icon>
+          <span>Chatbot</span>
+        </button>
+        <button mat-menu-item>
+          <mat-icon>settings</mat-icon>
+          <span>Configuración</span>
+        </button>
+      </mat-menu>
+    </div>
+    <span>Ch13</span>
+  </mat-toolbar>
