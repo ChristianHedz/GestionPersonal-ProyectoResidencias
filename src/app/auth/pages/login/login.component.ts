@@ -27,8 +27,6 @@ import { LoginResponse } from '../../interfaces';
   styleUrl: './login.component.css'
 })
 export class LoginComponent {
-    // Control de estado de la UI
-    private isLoading = signal(false);
     
     // Servicios
     private validatorsService = inject(ValidatorsService);
@@ -57,17 +55,14 @@ export class LoginComponent {
         return;
       }
       
-      this.isLoading.set(true);
   
       this.authService.login(this.loginForm.value as LoginResponse)
         .subscribe({
           next: (success: boolean) => {
-            this.isLoading.set(false);
             Swal.fire('¡Inicio de sesión exitoso!', 'Has iniciado sesión correctamente', 'success');
             this.router.navigateByUrl('/inicio');
           },
           error: (error: any) => {
-            this.isLoading.set(false);
             console.error('Error de autenticación:', error);
             Swal.fire('Error', 'Credenciales incorrectas', 'error');
           }

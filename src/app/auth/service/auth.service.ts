@@ -62,7 +62,7 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${this.url}/login`,credentials).pipe(
 
       tap((employee: AuthResponse) => {
-        sessionStorage.setItem("jwt",employee.token);
+        localStorage.setItem("jwt",employee.token);
         this._currentUserToken.set(employee.token);
         this._authStatus.set(AuthStatus.authenticated);
       }),
@@ -76,9 +76,11 @@ export class AuthService {
   }
 
   registerUsers(credentials: registerResponse):Observable<boolean>{
+    console.log(credentials);
     return this.http.post<AuthResponse>(`${this.url}/register`,credentials).pipe(
       tap((employee: AuthResponse) => {
-        sessionStorage.setItem("jwt",employee.token);
+        console.log(employee);
+        localStorage.setItem("jwt",employee.token);
         this._currentRegisteredUser.set(employee);
         this._authStatus.set(AuthStatus.authenticated);
       }),

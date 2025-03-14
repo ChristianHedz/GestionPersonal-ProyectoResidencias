@@ -27,12 +27,12 @@ export class RegisterComponent {
   private AuthService = inject(AuthService);
   
   public registerForm = this.fb.group({
-    fullname: ['',[Validators.required, Validators.pattern(this.validatorsService.firstNameAndLastnamePattern)]],
+    fullName: ['',[Validators.required, Validators.pattern(this.validatorsService.firstNameAndLastnamePattern)]],
     email: ['',[Validators.required, Validators.pattern(this.validatorsService.emailPattern)]],
     password: ['',[Validators.required]],
   });
   
-  fullname = computed(()=> this.registerForm.controls.fullname)
+  fullName = computed(()=> this.registerForm.controls.fullName)
 
   email = computed(()=> this.registerForm.controls.email)
 
