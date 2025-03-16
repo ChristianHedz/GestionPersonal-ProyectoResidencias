@@ -4,7 +4,7 @@ import { AnimatedBackgroundComponent } from './shared/animated-background/animat
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterModule,AnimatedBackgroundComponent],  // Removed AnimatedBackgroundComponent
+  imports: [RouterOutlet, RouterModule],  // Removed AnimatedBackgroundComponent
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })

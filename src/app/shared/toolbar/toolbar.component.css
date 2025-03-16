@@ -1,8 +1,9 @@
 .toolbar-gradient {
-    background: -webkit-linear-gradient(90deg, #0a944d,#0084ff,#74229b);
-    background: linear-gradient(90deg, #028b44,#008cff,#8929b6);
+  background-color: transparent;
     color: white;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     position: relative;
     z-index: 10;
   }
+
+  
