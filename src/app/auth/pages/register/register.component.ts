@@ -11,6 +11,7 @@ import { AuthService } from '../../service/auth.service';
 import Swal from 'sweetalert2';
 import { HttpClient} from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+import { AuthResponse } from '../../interfaces/authResponse';
 
 @Component({
   selector: 'app-register',
@@ -47,16 +48,16 @@ export class RegisterComponent {
 
     this.AuthService.registerUsers(this.registerForm.value as registerResponse)
       .subscribe({
-        next: (success) => {
-          Swal.fire('¡Registro exitoso!', 'Tu cuenta ha sido creada correctamente', 'success');
-          this.router.navigateByUrl('admin/inicio');
-        },
+          next: (employee: AuthResponse) => {
+            Swal.fire('¡Inicio de sesión exitoso!', 'Has iniciado sesión correctamente', 'success');
+            employee.role === 'ADMIN' ? this.router.navigateByUrl('/admin/inicio')
+             : this.router.navigateByUrl('/admin/info');
+          },
         error: (error) => {
           Swal.fire('Error', 'No se pudo completar el registro', 'error');
         }
       });
   }
-
 
   isValidField(field: string): boolean | null {
     const control = this.registerForm.get(field);

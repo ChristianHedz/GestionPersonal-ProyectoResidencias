@@ -9,7 +9,7 @@ export const isNotAuthGuard: CanActivateFn = (route,state) => {
   const router = inject( Router );
 
   if(authService.authStatus() === AuthStatus.authenticated){
-    router.navigateByUrl('/inicio');
+    router.navigateByUrl('admin/inicio');
     return false;
   }
   return true;

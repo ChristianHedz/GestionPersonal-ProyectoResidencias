@@ -5,12 +5,13 @@ import { AuthStatus } from '../interfaces/authStatus.enum';
 import { AuthResponse } from '../interfaces/authResponse';
 import { LoginResponse, registerResponse } from '../interfaces';
 import { environment } from '../../../env/enviroments';
-import { catchError, map, Observable, of, tap, throwError } from 'rxjs';
+import { catchError, map, Observable, of, shareReplay, tap, throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+
   private http = inject(HttpClient);
   private readonly url: string = environment.urlApi;
   private router = inject(Router);
@@ -18,11 +19,13 @@ export class AuthService {
   private _authStatus = signal<AuthStatus>(AuthStatus.checking);
   public authStatus = computed(() => this._authStatus());
 
-  private _currentAuthUser = signal<AuthResponse | null>(null);
-  public currentAuthUser = computed(() => this._currentAuthUser());
+  private _AuthUser = signal<AuthResponse | null>(null);
+  public AuthUser = computed(() => this._AuthUser());
 
-  private _currentRegisteredUser = signal<AuthResponse | null>(null);
-  public currentRegisteredUser = computed(() => this._currentRegisteredUser());
+  private _RegisteredUser = signal<AuthResponse | null>(null);
+  public RegisteredUser = computed(() => this._RegisteredUser());
+
+  public isAdmin = computed(() => this.AuthUser()?.role === 'ADMIN');
 
   constructor() {
     this.checkAuthStatus();
@@ -34,17 +37,19 @@ export class AuthService {
 
   isLogged(): Observable<boolean> {
     const isLogged = localStorage.getItem("isLogged") === AuthStatus.authenticated;
-    
     this._authStatus.set(isLogged ? AuthStatus.authenticated : AuthStatus.notAuthenticated);
     
     if (!isLogged) return of(false);
-
-    return this.http.get<AuthResponse>(`${this.url}/profile`, { withCredentials: true })
-      .pipe(
-        tap(employee => this._currentAuthUser.set(employee)),
-        tap(() => this._authStatus.set(AuthStatus.authenticated)),
-        map(() => true),
-        catchError(() => {
+    console.log('isLogged', isLogged);
+    
+    return this.http.get<AuthResponse>(`${this.url}/profile`)
+    .pipe(
+      shareReplay(),
+      tap(employee => this._AuthUser.set(employee)),
+      tap(() => console.log('isLogged', isLogged)),
+      tap(() => this._authStatus.set(AuthStatus.authenticated)),
+      map(() => true),
+      catchError(() => {
           this.handleLogout();
           return of(false);
         })
@@ -54,7 +59,7 @@ export class AuthService {
   login(credentials: LoginResponse): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.url}/login`, credentials, { withCredentials: true })
       .pipe(
-        tap(employee => this._currentAuthUser.set(employee)),
+        tap(employee => this._AuthUser.set(employee)),
         tap(() => this.handleSuccessfulAuth()),
         catchError((error) => {
           this.handleLogout();
@@ -66,7 +71,7 @@ export class AuthService {
   registerUsers(credentials: registerResponse): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.url}/register`, credentials, { withCredentials: true })
       .pipe(
-        tap(employee => this._currentRegisteredUser.set(employee)),
+        tap(employee => this._RegisteredUser.set(employee)),
         tap(() => this.handleSuccessfulAuth()),
         catchError((error) => {
           this.handleLogout();
@@ -82,7 +87,7 @@ export class AuthService {
 
   private handleLogout(): void {
     this._authStatus.set(AuthStatus.notAuthenticated);
-    this._currentAuthUser.set(null);
+    this._AuthUser.set(null);
     localStorage.removeItem("isLogged");
   }
 

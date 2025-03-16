@@ -1,3 +1,4 @@
+import { AuthResponse } from './../../interfaces/authResponse';
 import { Component, computed, inject} from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -11,7 +12,6 @@ import { AuthService } from '../../service/auth.service';
 import { ValidatorsService } from '../../service/validators.service';
 import Swal from 'sweetalert2';
 import { LoginResponse } from '../../interfaces';
-import { AuthResponse } from '../../interfaces/authResponse';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @Component({
@@ -60,9 +60,10 @@ export class LoginComponent {
   
       this.authService.login(this.loginForm.value as LoginResponse)
         .subscribe({
-          next: (success: AuthResponse) => {
+          next: (employee: AuthResponse) => {
             Swal.fire('¡Inicio de sesión exitoso!', 'Has iniciado sesión correctamente', 'success');
-            this.router.navigateByUrl('admin/inicio');
+            employee.role === 'ADMIN' ? this.router.navigateByUrl('/admin/inicio')
+             : this.router.navigateByUrl('/admin/info');
           },
           error: (error: any) => {
             console.error('Error de autenticación:', error);
