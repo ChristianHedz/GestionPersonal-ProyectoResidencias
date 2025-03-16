@@ -1,26 +1,31 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject} from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../service/auth.service';
 import { ValidatorsService } from '../../service/validators.service';
 import Swal from 'sweetalert2';
 import { LoginResponse } from '../../interfaces';
+import { AuthResponse } from '../../interfaces/authResponse';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @Component({
   selector: 'app-login',
-  standalone: true, // Marcar como standalone
+  standalone: true, 
   imports: [
     CommonModule,
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
+    MatCardModule,
     MatButtonModule,
     MatIconModule,
+    MatCheckboxModule,
     RouterModule
   ],
   templateUrl: './login.component.html',
@@ -28,13 +33,11 @@ import { LoginResponse } from '../../interfaces';
 })
 export class LoginComponent {
     
-    // Servicios
     private validatorsService = inject(ValidatorsService);
     private fb = inject(FormBuilder);
     private router = inject(Router);
-    private authService = inject(AuthService); // Cambiado a camelCase
+    private authService = inject(AuthService);
     
-    // Formulario
     public loginForm = this.fb.group({
       email: ['', [
         Validators.required, 
@@ -47,7 +50,6 @@ export class LoginComponent {
     email = computed(() => this.loginForm.controls.email);
     password = computed(() => this.loginForm.controls.password);
 
-    // Método de inicio de sesión (cambiado de register a login)
     login(): void {
       if (this.loginForm.invalid) {
         this.loginForm.markAllAsTouched();
@@ -58,9 +60,9 @@ export class LoginComponent {
   
       this.authService.login(this.loginForm.value as LoginResponse)
         .subscribe({
-          next: (success: boolean) => {
+          next: (success: AuthResponse) => {
             Swal.fire('¡Inicio de sesión exitoso!', 'Has iniciado sesión correctamente', 'success');
-            this.router.navigateByUrl('/inicio');
+            this.router.navigateByUrl('admin/inicio');
           },
           error: (error: any) => {
             console.error('Error de autenticación:', error);

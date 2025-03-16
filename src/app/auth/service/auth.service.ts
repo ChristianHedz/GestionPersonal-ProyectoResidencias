@@ -1,4 +1,4 @@
-import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthStatus } from '../interfaces/authStatus.enum';
@@ -11,95 +11,92 @@ import { catchError, map, Observable, of, tap, throwError } from 'rxjs';
   providedIn: 'root'
 })
 export class AuthService {
-
   private http = inject(HttpClient);
-  private readonly url:string = environment.urlApi;
+  private readonly url: string = environment.urlApi;
   private router = inject(Router);
 
   private _authStatus = signal<AuthStatus>(AuthStatus.checking);
-  public authStatus  = computed(() => this._authStatus());
+  public authStatus = computed(() => this._authStatus());
 
-  private _currentAuthUser = signal<AuthResponse|null>(null);
-  public currentAuthUser   = computed(() => this._currentAuthUser());
+  private _currentAuthUser = signal<AuthResponse | null>(null);
+  public currentAuthUser = computed(() => this._currentAuthUser());
 
-  private _currentUserToken = signal<String|null>(null);
-  public currentUserToken  = computed(() => this._currentUserToken());
-
-  private _currentRegisteredUser = signal<AuthResponse|null>(null);
+  private _currentRegisteredUser = signal<AuthResponse | null>(null);
   public currentRegisteredUser = computed(() => this._currentRegisteredUser());
 
   constructor() {
-    this.isLogged().subscribe();
-   }
+    this.checkAuthStatus();
+  }
 
+  private checkAuthStatus(): void {
+    this.isLogged().subscribe();
+  }
 
   isLogged(): Observable<boolean> {
-    const token = localStorage.getItem('token');
-    if(!token){
-      this._authStatus.set(AuthStatus.notAuthenticated);
-      return of(false);
-    }else{
-      this._authStatus.set(AuthStatus.authenticated);
-    }
-
-    const headers = new HttpHeaders().set('Authorization', 'Bearer ' + token);
+    const isLogged = localStorage.getItem("isLogged") === AuthStatus.authenticated;
     
-    return this.http.get<AuthResponse>(`${this.url}/profile`,{headers}).pipe(
-      tap((employee: AuthResponse) => {
-        this._currentAuthUser.set(employee);
-        this._currentUserToken.set(AuthStatus.authenticated);
-      }),
-      map(() => true),
-      catchError((error) => {
-        this._authStatus.set(AuthStatus.notAuthenticated);
-        return this.handleError(error);
-      })   
-    );
+    this._authStatus.set(isLogged ? AuthStatus.authenticated : AuthStatus.notAuthenticated);
+    
+    if (!isLogged) return of(false);
+
+    return this.http.get<AuthResponse>(`${this.url}/profile`, { withCredentials: true })
+      .pipe(
+        tap(employee => this._currentAuthUser.set(employee)),
+        tap(() => this._authStatus.set(AuthStatus.authenticated)),
+        map(() => true),
+        catchError(() => {
+          this.handleLogout();
+          return of(false);
+        })
+      );
   }
 
-
-  login(credentials: LoginResponse):Observable<boolean>{
-    return this.http.post<AuthResponse>(`${this.url}/login`,credentials).pipe(
-
-      tap((employee: AuthResponse) => {
-        localStorage.setItem("jwt",employee.token);
-        this._currentUserToken.set(employee.token);
-        this._authStatus.set(AuthStatus.authenticated);
-      }),
-      map(() => true),
-      catchError((error)=> {
-        this._authStatus.set(AuthStatus.notAuthenticated);
-        return this.handleError(error);
-      })
-
-    )
+  login(credentials: LoginResponse): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.url}/login`, credentials, { withCredentials: true })
+      .pipe(
+        tap(employee => this._currentAuthUser.set(employee)),
+        tap(() => this.handleSuccessfulAuth()),
+        catchError((error) => {
+          this.handleLogout();
+          return this.handleError(error);
+        })
+      );
   }
 
-  registerUsers(credentials: registerResponse):Observable<boolean>{
-    console.log(credentials);
-    return this.http.post<AuthResponse>(`${this.url}/register`,credentials).pipe(
-      tap((employee: AuthResponse) => {
-        console.log(employee);
-        localStorage.setItem("jwt",employee.token);
-        this._currentRegisteredUser.set(employee);
-        this._authStatus.set(AuthStatus.authenticated);
-      }),
-      map(() => true),
-      catchError((error)=>{
-        this._authStatus.set(AuthStatus.notAuthenticated);
-        return this.handleError(error)
-      })
-    )
-  } 
+  registerUsers(credentials: registerResponse): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.url}/register`, credentials, { withCredentials: true })
+      .pipe(
+        tap(employee => this._currentRegisteredUser.set(employee)),
+        tap(() => this.handleSuccessfulAuth()),
+        catchError((error) => {
+          this.handleLogout();
+          return this.handleError(error);
+        })
+      );
+  }
 
-  private handleError(error: HttpErrorResponse){
-    if(error.status === 0){
-      console.error('Ha ocurrido un error', error.error);
-    }else{
-      console.error(`Backend regreso codigo ${error.status}, el cuerpo fue: ${error.error}`);
+  private handleSuccessfulAuth(): void {
+    this._authStatus.set(AuthStatus.authenticated);
+    localStorage.setItem("isLogged", AuthStatus.authenticated);
+  }
+
+  private handleLogout(): void {
+    this._authStatus.set(AuthStatus.notAuthenticated);
+    this._currentAuthUser.set(null);
+    localStorage.removeItem("isLogged");
+  }
+
+  logout(): void {
+    this.handleLogout();
+    this.router.navigateByUrl('/login');
+  }
+
+  private handleError(error: HttpErrorResponse) {
+    if (error.status === 0) {
+      console.error('Ha ocurrido un error de red:', error.error);
+    } else {
+      console.error(`Backend retornó código ${error.status}, error: ${error.error}`);
     }
     return throwError(() => new Error('Por favor intenta de nuevo'));
   }
-
-
 }

@@ -49,7 +49,7 @@ export class RegisterComponent {
       .subscribe({
         next: (success) => {
           Swal.fire('¡Registro exitoso!', 'Tu cuenta ha sido creada correctamente', 'success');
-          this.router.navigateByUrl('/inicio');
+          this.router.navigateByUrl('admin/inicio');
         },
         error: (error) => {
           Swal.fire('Error', 'No se pudo completar el registro', 'error');
