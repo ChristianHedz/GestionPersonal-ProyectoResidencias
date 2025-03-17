@@ -13,6 +13,7 @@ import { HttpClient} from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { AuthResponse } from '../../interfaces/authResponse';
 
+
 @Component({
   selector: 'app-register',
   imports: [ReactiveFormsModule,MatFormFieldModule,MatInputModule,
@@ -54,7 +55,7 @@ export class RegisterComponent {
              : this.router.navigateByUrl('/admin/info');
           },
         error: (error) => {
-          Swal.fire('Error', 'No se pudo completar el registro', 'error');
+          Swal.fire(error.error.error, 'No se pudo completar el registro', 'error');
         }
       });
   }

@@ -6,6 +6,7 @@ import { AuthResponse } from '../interfaces/authResponse';
 import { LoginResponse, registerResponse } from '../interfaces';
 import { environment } from '../../../env/enviroments';
 import { catchError, map, Observable, of, shareReplay, tap, throwError } from 'rxjs';
+import Swal from 'sweetalert2';
 
 @Injectable({
   providedIn: 'root'
@@ -44,7 +45,6 @@ export class AuthService {
     
     return this.http.get<AuthResponse>(`${this.url}/profile`)
     .pipe(
-      shareReplay(),
       tap(employee => this._AuthUser.set(employee)),
       tap(() => console.log('isLogged', isLogged)),
       tap(() => this._authStatus.set(AuthStatus.authenticated)),
@@ -63,7 +63,7 @@ export class AuthService {
         tap(() => this.handleSuccessfulAuth()),
         catchError((error) => {
           this.handleLogout();
-          return this.handleError(error);
+          return throwError(() => this.handleError(error));
         })
       );
   }
@@ -75,9 +75,17 @@ export class AuthService {
         tap(() => this.handleSuccessfulAuth()),
         catchError((error) => {
           this.handleLogout();
-          return this.handleError(error);
+          return throwError(() => this.handleError(error));
         })
       );
+  }
+
+  logout(): Observable<void> {
+    return this.http.post<void>(`${this.url}/logout`, null)
+    .pipe(
+      tap(() => this.handleLogout()),
+      catchError((error) => throwError(() => this.handleError(error)))
+    )
   }
 
   private handleSuccessfulAuth(): void {
@@ -91,17 +99,13 @@ export class AuthService {
     localStorage.removeItem("isLogged");
   }
 
-  logout(): void {
-    this.handleLogout();
-    this.router.navigateByUrl('/login');
-  }
-
   private handleError(error: HttpErrorResponse) {
     if (error.status === 0) {
       console.error('Ha ocurrido un error de red:', error.error);
     } else {
+      console.error(error.error.error);
       console.error(`Backend retornó código ${error.status}, error: ${error.error}`);
     }
-    return throwError(() => new Error('Por favor intenta de nuevo'));
+    return error;
   }
 }
