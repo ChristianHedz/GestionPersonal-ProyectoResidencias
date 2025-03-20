@@ -9,15 +9,17 @@ import { ValidatorsService } from '../../service/validators.service';
 import { registerResponse } from '../../interfaces';
 import { AuthService } from '../../service/auth.service';
 import Swal from 'sweetalert2';
-import { HttpClient} from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { AuthResponse } from '../../interfaces/authResponse';
+import { NgxSpinnerService } from 'ngx-spinner';
+import { NgxSpinnerModule } from 'ngx-spinner';
+
 
 
 @Component({
   selector: 'app-register',
   imports: [ReactiveFormsModule,MatFormFieldModule,MatInputModule,
-      MatButtonModule,MatIconModule,MatButtonModule,RouterModule,CommonModule],
+      MatButtonModule,MatIconModule,MatButtonModule,RouterModule,CommonModule,NgxSpinnerModule],
   templateUrl: './register.component.html',
   styleUrl: './register.component.css'
 })
@@ -27,6 +29,8 @@ export class RegisterComponent {
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private AuthService = inject(AuthService);
+  private spinner = inject(NgxSpinnerService);
+
   
   public registerForm = this.fb.group({
     fullName: ['',[Validators.required, Validators.pattern(this.validatorsService.firstNameAndLastnamePattern)]],
@@ -46,15 +50,19 @@ export class RegisterComponent {
       Swal.fire('Error!', 'Por favor completa correctamente el formulario', 'error');
       return;
     }
-
+    
+    this.spinner.show();
+    
     this.AuthService.registerUsers(this.registerForm.value as registerResponse)
       .subscribe({
           next: (employee: AuthResponse) => {
+            this.spinner.hide();
             Swal.fire('¡Inicio de sesión exitoso!', 'Has iniciado sesión correctamente', 'success');
-            employee.role === 'ADMIN' ? this.router.navigateByUrl('/admin/inicio')
-             : this.router.navigateByUrl('/admin/info');
+            employee.role === 'ADMIN' ? this.router.navigateByUrl('/admin/info')
+             : this.router.navigateByUrl('/admin/inicio');
           },
         error: (error) => {
+          this.spinner.hide();
           Swal.fire(error.error.error, 'No se pudo completar el registro', 'error');
         }
       });
