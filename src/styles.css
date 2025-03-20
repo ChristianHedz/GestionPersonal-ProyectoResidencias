@@ -8,6 +8,12 @@ body {
   color: white;
 }
 
+@media (width < 576px) {
+  body {
+    overflow-y: scroll !important;
+  }
+}
+
 .zindex{
   z-index: 2;
 }
