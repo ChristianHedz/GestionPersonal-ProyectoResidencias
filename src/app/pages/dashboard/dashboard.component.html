@@ -12,9 +12,10 @@
         <div class="col-12 md:col-6">
           <div class="p-d-flex p-flex-column p-align-center p-text-center blur">
             <!-- Time Display -->
+            <!-- Time Display -->
             <div class="time-display text-center ">
-              <h1 class="text-5xl font-light mb-0 mt-2">09:12</h1>
-              <h3 class="font-light text-600 mt-0">Miércoles, Dic 12</h3>
+              <h1 class="text-5xl font-light mb-0 mt-2">{{ currentTime }}</h1>
+              <h3 class="font-light text-600 mt-0">{{ currentDate }}</h3>
             </div>
             
             <!-- User Icon -->
@@ -41,7 +42,7 @@
             
             <!-- Primary Button -->
             <div class="p-mt-4 text-center mt-5">
-              <button mat-raised-button color="primary">PRIMARY</button>
+              <button mat-raised-button color="primary" (click)="sendTimeToBackend()">REGISTRAR HORA</button>
             </div>
           </div>
         </div>
