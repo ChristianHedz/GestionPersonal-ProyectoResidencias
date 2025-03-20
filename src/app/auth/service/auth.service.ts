@@ -6,6 +6,7 @@ import { AuthResponse } from '../interfaces/authResponse';
 import { LoginResponse, registerResponse } from '../interfaces';
 import { environment } from '../../../env/enviroments';
 import { catchError, map, Observable, of, tap, throwError } from 'rxjs';
+import { ApiError } from '../interfaces/apiError';
 
 @Injectable({
   providedIn: 'root'
@@ -23,9 +24,6 @@ export class AuthService {
   private _currentUser = signal<AuthResponse | null>(null);
   public currentUser = computed(() => this._currentUser());
 
-  private _registeredUser = signal<AuthResponse | null>(null);
-  public registeredUser = computed(() => this._registeredUser());
-
   public isAdmin = computed(() => this.currentUser()?.role === 'ADMIN');
 
   constructor() {
@@ -40,12 +38,14 @@ export class AuthService {
     const isLogged = localStorage.getItem(this.STORAGE_KEY) === AuthStatus.authenticated;
     this._authStatus.set(isLogged ? AuthStatus.authenticated : AuthStatus.notAuthenticated);
     
+    console.log('Usuario autenticado pendiente');
     if (!isLogged) return of(false);
     
     return this.http.get<AuthResponse>(`${this.url}/profile`)
       .pipe(
         tap(employee => this._currentUser.set(employee)),
         tap(() => this._authStatus.set(AuthStatus.authenticated)),
+        tap(() => console.log('Usuario autenticado')),
         map(() => true),
         catchError(() => {
           this.handleLogout();
@@ -69,7 +69,7 @@ export class AuthService {
     registerUsers(credentials: registerResponse): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.url}/register`, credentials, { withCredentials: true })
       .pipe(
-        tap(employee => this._registeredUser.set(employee)),
+        tap(employee => this._currentUser.set(employee)),
         tap(() => this.handleSuccessfulAuth()),
         catchError((error) => {
           this.handleLogout();
@@ -97,24 +97,33 @@ export class AuthService {
     localStorage.removeItem(this.STORAGE_KEY);
   }
 
-  private handleError(error: HttpErrorResponse): any {
+
+  
+  // ...
+  
+  private handleError(error: HttpErrorResponse): ApiError {
     const errorMessages: Record<number, string> = {
       0: 'Error de conexión. Por favor, verifica tu conexión a internet.',
       401: 'Usuario no autorizado. Por favor inicia sesión nuevamente.',
       403: 'No tienes permisos para realizar esta acción.',
       404: 'Recurso no encontrado.'
     };
-
+  
+    // Intentar extraer el mensaje de error del backend si existe
+    const backendMessage = error.error?.message || '';
+  
     const errorMessage = errorMessages[error.status] || 
-                       error.error?.message || 
-                    `Error ${error.status}: ${error.statusText || 'Error desconocido'}`;
-
+                       backendMessage || 
+                       `Error ${error.status}: ${error.statusText || 'Error desconocido'}`;
+  
     console.error('API Error:', error);
     
     return {
       status: error.status,
       message: errorMessage,
-      originalError: error
+      timestamp: new Date().toISOString(),
+      url: error.url || '',
+      error: error.error || error
     };
   }
 }

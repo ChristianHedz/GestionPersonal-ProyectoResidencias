@@ -11,13 +11,15 @@ import { ToolbarComponent } from "../../shared/toolbar/toolbar.component";
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import 'animate.css';
+import { AuthResponse } from '../../auth/interfaces/authResponse';
 
 @Component({
   selector: 'app-dashboard',
+  standalone: true,
   imports: [MatCheckboxModule, MatToolbarModule, MatButtonModule, MatIconModule,
-    MatMenuModule, RouterModule, ToolbarComponent,CommonModule],
+    MatMenuModule, RouterModule, ToolbarComponent, CommonModule,],
   templateUrl: './dashboard.component.html',
-  styleUrl: './dashboard.component.css',
+  styleUrls: ['./dashboard.component.css'],
 
 })
 export class DashboardComponent implements OnInit, OnDestroy {
@@ -27,9 +29,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private timeRecordService = inject(HttpClient);
   private dashboardService = inject(DashboardService);
   private authService = inject(AuthService);
-
-  // crar un compute para el tiempo actual
-  currentUser = computed(() => this.authService.currentUser);
+  currentUser = computed(() => this.authService.currentUser());
 
   ngOnInit(): void {
     // Actualizar inmediatamente al iniciar
@@ -86,5 +86,4 @@ export class DashboardComponent implements OnInit, OnDestroy {
         }
       });
   }
-
 }
