@@ -3,21 +3,39 @@ import { DashboardService } from './../../service/dashboard.service';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { Component, computed, inject, OnDestroy, OnInit, } from '@angular/core';
+import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatDividerModule } from '@angular/material/divider';
 import { RouterModule } from '@angular/router';
-import { ToolbarComponent } from "../../shared/toolbar/toolbar.component";
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { ToolbarComponent } from '../../shared/toolbar/toolbar.component';
 import 'animate.css';
 import { AuthResponse } from '../../auth/interfaces/authResponse';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [MatCheckboxModule, MatToolbarModule, MatButtonModule, MatIconModule,
-    MatMenuModule, RouterModule, ToolbarComponent, CommonModule,],
+  imports: [
+    MatCheckboxModule, 
+    MatToolbarModule, 
+    MatButtonModule, 
+    MatIconModule,
+    MatMenuModule, 
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonToggleModule,
+    MatDividerModule,
+    RouterModule, 
+    CommonModule,
+    ToolbarComponent
+  ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
 
@@ -25,6 +43,7 @@ import { AuthResponse } from '../../auth/interfaces/authResponse';
 export class DashboardComponent implements OnInit, OnDestroy {
   currentTime: string = '';
   currentDate: string = '';
+  currentView = signal<'boton' | 'codigo'>('boton');
   private timerInterval: any;
   private timeRecordService = inject(HttpClient);
   private dashboardService = inject(DashboardService);
@@ -67,6 +86,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
     
     // Capitalizar primera letra y formatear
     this.currentDate = this.currentDate.charAt(0).toUpperCase() + this.currentDate.slice(1);
+  }
+
+  onViewChange(view: 'boton' | 'codigo'): void {
+    this.currentView.set(view);
   }
 
   sendTimeToBackend(): void {

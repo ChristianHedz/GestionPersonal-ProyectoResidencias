@@ -1,0 +1,126 @@
+/* Card styling */
+.mat-card {
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+  backdrop-filter: blur(10px);
+  background-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+
+/* Button toggle group styling with improved responsiveness */
+.mat-button-toggle-group {
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin: 0 auto;
+}
+
+.blur-toggle {
+  backdrop-filter: blur(8px);
+  background-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 250px;
+  margin: 0 auto;
+}
+
+.mat-button-toggle {
+  background-color: transparent;
+  color: rgba(0, 0, 0, 0.7);
+  font-weight: 500;
+  padding: 0 16px;
+  flex: 1;
+}
+
+.mat-button-toggle.mat-button-toggle-checked {
+  background-color: rgba(63, 81, 181, 0.8);
+  color: white;
+}
+
+/* Time display styling */
+.time-display h1 {
+  font-size: 2.5rem;
+  font-weight: 300;
+  margin-bottom: 0.5rem;
+}
+
+.time-display h3 {
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.6);
+  text-transform: capitalize;
+  font-size: 1rem;
+}
+
+/* Form field styling */
+.mat-form-field {
+  width: 100%;
+}
+
+/* Photo placeholder styling */
+.photo-placeholder {
+  width: 8rem;
+  height: 8rem;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(245, 245, 245, 0.3);
+  margin: 0 auto 1rem auto;
+}
+
+/* User information styling */
+.user-info {
+  margin-bottom: 1rem;
+}
+
+.user-info .label {
+  font-weight: 500;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.user-info .value {
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+/* Primary button styling */
+.primary-button {
+  background-color: #3f51b5;
+  color: white;
+  width: 100%;
+  padding: 0.75rem;
+  font-weight: 500;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+/* Responsive styling */
+@media screen and (max-width: 640px) {
+  .time-display h1 {
+    font-size: 2rem;
+  }
+  
+  .time-display h3 {
+    font-size: 0.9rem;
+  }
+  
+  .blur {
+    padding: 1rem;
+  }
+}
+
+/* Code block styling */
+.code-block {
+  background-color: rgba(245, 245, 245, 0.8);
+  color: #333;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  padding: 1rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  border: 1px solid #e0e0e0;
+}

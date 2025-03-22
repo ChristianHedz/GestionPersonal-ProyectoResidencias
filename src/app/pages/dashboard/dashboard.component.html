@@ -1,67 +1,62 @@
-<div class="flex flex-column h-screen ">
-    <!-- Toolbar -->
-    <!-- app.component.html -->
-    <div class="flex flex-column h-screen">
-        <!-- Toolbar -->
-    <app-toolbar/>
-    <!-- Content Area -->
-    <div class="flex-1 overflow-y-auto p-4">
-      <div class="grid">
-        <!-- Left Column - Time and User Info -->
-        <div class="col-12 md:col-6">
-          <div class="p-d-flex p-flex-column p-align-center p-text-center blur">
-            <!-- Time Display -->
-            <!-- Time Display -->
-            <div class="time-display text-center ">
-              <h1 class="text-5xl font-light mb-0 mt-2">{{ currentTime }}</h1>
-              <h3 class="font-light text-600 mt-0">{{ currentDate }}</h3>
-            </div>
-            
-            <!-- User Icon -->
-            <div class="flex justify-content-center my-4 p-mt-4">
-              <div class="w-8rem h-8rem">
-                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="50" cy="50" r="45" fill="#C0C0C0" />
-                  <polygon points="50,20 80,70 20,70" fill="#808080" />
-                  <path d="M50,50 L20,50 A30,30 0 0,0 50,80 Z" fill="#808080" />
-                </svg>
+<div class="flex flex-column h-screen">
+  <!-- Toolbar -->
+  <app-toolbar></app-toolbar>
+
+  <!-- Content Area -->
+  <div class="flex-1 overflow-y-auto p-4">
+    <!-- Toggle Buttons at the top with better responsiveness -->
+    <div class="flex justify-content-center mb-3 w-full">
+      <mat-button-toggle-group #group="matButtonToggleGroup" [value]="currentView()" (change)="onViewChange(group.value)" class="blur-toggle w-10rem sm:w-12rem md:w-15rem">
+        <mat-button-toggle value="boton">Botón</mat-button-toggle>
+        <mat-button-toggle value="codigo">Código</mat-button-toggle>
+      </mat-button-toggle-group>
+    </div>
+
+    <div class="container mx-auto p-3" *ngIf="currentView() === 'boton'">
+      <div class="grid justify-content-center">
+        <!-- Centered Time and Registration - only one column now -->
+        <div class="col-12 sm:col-10 md:col-8 lg:col-6 p-3">
+          <div class="blur">
+            <div class="flex flex-column align-items-center">
+              <!-- Time Display -->
+              <div class="time-display text-center mb-4">
+                <h1 class="text-5xl font-light mb-2">{{ currentTime }}</h1>
+                <h3 class="font-light text-600 m-0">{{ currentDate }}</h3>
               </div>
-            </div>
-  
-            <!-- User Information -->
-            <div class="mt-4 text-center" *ngIf="currentUser">
-              <span class="label-text"><strong>Nombre:</strong> {{ currentUser()?.fullName }}</span>
-            </div>
-            <div class="mt-4 text-center" *ngIf="currentUser">
-              <span class="label-text"><strong>Email:</strong> {{ currentUser()?.email }}</span>
-            </div>
-            <div class="mt-4 text-center" *ngIf="currentUser">
-              <span class="label-text"><strong>Rol:</strong> {{ currentUser()?.role }}</span>
-            </div>
-            
-            <!-- Primary Button -->
-            <div class="p-mt-4 text-center mt-5">
-              <button mat-raised-button color="primary" (click)="sendTimeToBackend()">REGISTRAR HORA</button>
-            </div>
-          </div>
-        </div>
-  
-        <!-- Right Column - Employee List -->
-        <div class="col-12 md:col-6">
-          <div class="p-mt-4 md:p-mt-0">
-            <div class="employee-list-container blur">
-              <h4 class="text-sm font-medium m-0 text-center">LISTA DE EMPLEADOS</h4>
               
-              <!-- Checkboxes -->
-              <div class="p-mt-4">
-                <mat-checkbox [checked]="false">Label</mat-checkbox>
+              <!-- Email Input -->
+              <div class="w-full sm:w-10 md:w-8 mb-4">
+                <mat-form-field appearance="outline" class="w-full">
+                  <mat-label>Introduce tu correo</mat-label>
+                  <input matInput type="email">
+                  <mat-icon matSuffix>email</mat-icon>
+                </mat-form-field>
               </div>
-              <div class="p-mt-2">
-                <mat-checkbox [checked]="true">Label</mat-checkbox>
+              
+              <!-- Registration Button -->
+              <div class="w-full sm:w-10 md:w-8">
+                <button mat-raised-button color="primary" class="w-full p-3">
+                  REGISTRAR
+                </button>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- Código View -->
+    <div class="container mx-auto p-3" *ngIf="currentView() === 'codigo'">
+      <div class="grid justify-content-center">
+        <div class="col-12 sm:col-10 md:col-8 lg:col-6">
+          <div class="blur">
+            <div class="p-3">
+              <h2 class="mb-3">Código de la Página</h2>
+              <mat-divider class="mb-3"></mat-divider>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
+</div>
