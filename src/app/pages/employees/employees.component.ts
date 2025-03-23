@@ -1,14 +1,15 @@
-import { Component, DestroyRef, OnInit } from '@angular/core';
+import { EmployeesService } from './../../service/employees.service';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule, MatDialogConfig } from '@angular/material/dialog';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { EmployeesService } from '../../service/employees.service';
 import { EmployeeDTO } from '../../auth/interfaces/EmployeeDTO';
 import { ToolbarComponent } from '../../shared/toolbar/toolbar.component';
 import { EmployeeEditDialogComponent } from './employee-edit-dialog/employee-edit-dialog.component';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-employees',
@@ -25,44 +26,20 @@ import { EmployeeEditDialogComponent } from './employee-edit-dialog/employee-edi
   styleUrls: ['./employees.component.css']
 })
 export class EmployeesComponent implements OnInit {
+  private employeesService = inject(EmployeesService);
+  private dialog = inject(MatDialog);
+  private destroyRef = inject(DestroyRef);
+  private route = inject(ActivatedRoute);
   employees: EmployeeDTO[] = [];
-  loading = true;
+  loading = false;
   error: string | null = null;
 
-  constructor(
-    private employeesService: EmployeesService,
-    private dialog: MatDialog,
-    private destroyRef: DestroyRef
-  ) { }
-
   ngOnInit(): void {
-    this.loadEmployees();
+    this.employees = this.route.snapshot.data['employees'];
   }
 
-  loadEmployees(): void {
-    this.loading = true;
-    this.employeesService.listAllEmployees()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (data) => {
-          this.employees = data;
-          this.loading = false;
-        },
-        error: (err) => {
-          this.error = 'Error al cargar los empleados';
-          this.loading = false;
-          console.error('Error fetching employees:', err);
-        }
-      });
-  }
-
-  /**
-   * Opens the edit dialog for the selected employee
-   * @param employee The employee to edit
-   * @param event The click event
-   */
   openEditDialog(employee: EmployeeDTO, event: Event): void {
-    event.stopPropagation(); // Prevent event bubbling
+    event.stopPropagation();
     
     // Configuración responsiva del diálogo
     const dialogConfig = new MatDialogConfig();
