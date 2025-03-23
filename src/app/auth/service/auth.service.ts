@@ -7,6 +7,7 @@ import { LoginResponse, registerResponse } from '../interfaces';
 import { environment } from '../../../env/enviroments';
 import { catchError, map, Observable, of, tap, throwError } from 'rxjs';
 import { ApiError } from '../interfaces/apiError';
+import { ErrorHandlerService } from '../../service/error-handler.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,8 +16,9 @@ export class AuthService {
 
   private readonly http = inject(HttpClient);
   private readonly url: string = environment.urlApi;
-  private readonly router = inject(Router);
   private readonly STORAGE_KEY = 'isLogged';
+  private readonly handleError = inject(ErrorHandlerService)
+  private readonly errorHandler = this.handleError.handleError;
 
   private _authStatus = signal<AuthStatus>(AuthStatus.checking);
   public authStatus = computed(() => this._authStatus());
@@ -55,25 +57,25 @@ export class AuthService {
   }
 
     login(credentials: LoginResponse): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.url}/login`, credentials, { withCredentials: true })
+    return this.http.post<AuthResponse>(`${this.url}/login`, credentials)
       .pipe(
         tap(employee => this._currentUser.set(employee)),
         tap(() => this.handleSuccessfulAuth()),
         catchError((error) => {
           this.handleLogout();
-          return throwError(() => this.handleError(error));
+          return throwError(() => this.errorHandler(error));
         })
       );
   }
 
     registerUsers(credentials: registerResponse): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.url}/register`, credentials, { withCredentials: true })
+    return this.http.post<AuthResponse>(`${this.url}/register`, credentials)
       .pipe(
         tap(employee => this._currentUser.set(employee)),
         tap(() => this.handleSuccessfulAuth()),
         catchError((error) => {
           this.handleLogout();
-          return throwError(() => this.handleError(error));
+          return throwError(() => this.errorHandler(error));
         })
       );
   }
@@ -82,7 +84,7 @@ export class AuthService {
     return this.http.post<void>(`${this.url}/logout`, null)
       .pipe(
         tap(() => this.handleLogout()),
-        catchError((error) => throwError(() => this.handleError(error)))
+        catchError((error) => throwError(() => this.errorHandler(error)))
     )
   }
 
@@ -99,31 +101,5 @@ export class AuthService {
 
 
   
-  // ...
-  
-  private handleError(error: HttpErrorResponse): ApiError {
-    const errorMessages: Record<number, string> = {
-      0: 'Error de conexión. Por favor, verifica tu conexión a internet.',
-      401: 'Usuario no autorizado. Por favor inicia sesión nuevamente.',
-      403: 'No tienes permisos para realizar esta acción.',
-      404: 'Recurso no encontrado.'
-    };
-  
-    // Intentar extraer el mensaje de error del backend si existe
-    const backendMessage = error.error?.message || '';
-  
-    const errorMessage = errorMessages[error.status] || 
-                       backendMessage || 
-                       `Error ${error.status}: ${error.statusText || 'Error desconocido'}`;
-  
-    console.error('API Error:', error);
-    
-    return {
-      status: error.status,
-      message: errorMessage,
-      timestamp: new Date().toISOString(),
-      url: error.url || '',
-      error: error.error || error
-    };
-  }
+
 }
