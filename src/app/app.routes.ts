@@ -1,12 +1,12 @@
 import { Routes } from '@angular/router';
-
 import { LoginComponent } from './auth/pages/login/login.component';
 import { RegisterComponent } from './auth/pages/register/register.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
-import { isAuthGuard } from './auth/guards/is-auth.guard';
 import { isNotAuthGuard } from './auth/guards/is-not-auth.guard';
 import { InfoComponent } from './pages/info/info.component';
 import { isAdminGuard } from './auth/guards/is-admin.guard';
+import { isAuthGuard } from './auth/guards/is-auth.guard';
+import { EmployeesComponent } from './pages/employees/employees.component';
 
 export const routes: Routes = [
   // { path: 'inicio', redirectTo: 'admin/inicio', pathMatch: 'full' },
@@ -22,12 +22,17 @@ export const routes: Routes = [
       {
         path: 'inicio',
         component: DashboardComponent,
-        canMatch: [isAdminGuard]
+        // canMatch: [isAdminGuard]
       },
       {
         path: 'info',
         component: InfoComponent,
-        canMatch: [isAuthGuard],
+        // canMatch: [isAuthGuard],
+      },
+      {
+        path: 'empleados',
+        component: EmployeesComponent,
+        // canMatch: [isAuthGuard],
       },
       // {
       //   path: 'prueba',

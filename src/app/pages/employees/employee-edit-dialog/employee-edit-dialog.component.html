@@ -1,0 +1,96 @@
+<div class="employee-edit-dialog blurs">
+  <h2 mat-dialog-title class="text-center text-primary">Editar Empleado</h2>
+  
+  <mat-dialog-content class="p-2 md:p-3">
+    <!-- Error message if present -->
+    <div *ngIf="error" class="mb-2 p-2 border-round bg-red-100 text-red-700 text-sm">
+      <mat-icon class="vertical-align-middle mr-2" style="font-size: 18px; height: 18px; width: 18px;">error</mat-icon>
+      {{ error }}
+    </div>
+    
+    <form [formGroup]="employeeForm" class="grid">
+      <!-- Photo Preview at top for mobile -->
+      <div class="col-12 mb-3 text-center block md:hidden photo-preview-container">
+        <div class="text-sm mb-1 text-600">Foto de perfil:</div>
+        <img [src]="employeeForm.get('photo')?.value || 'https://www.w3schools.com/w3images/avatar2.png'" 
+             alt="Vista previa" 
+             class="w-6rem h-6rem border-circle shadow-2">
+      </div>
+      
+      <!-- Full Name -->
+      <div class="col-12 mb-2 md:mb-3">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Nombre Completo</mat-label>
+          <input matInput formControlName="fullName" placeholder="Nombre completo del empleado">
+          <mat-error *ngIf="employeeForm.get('fullName')?.errors?.['required']">
+            El nombre es requerido
+          </mat-error>
+        </mat-form-field>
+      </div>
+      
+      <!-- Email -->
+      <div class="col-12 mb-2 md:mb-3">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Correo Electrónico</mat-label>
+          <input matInput formControlName="email" placeholder="correo@ejemplo.com" type="email">
+          <mat-icon matSuffix>email</mat-icon>
+          <mat-error *ngIf="employeeForm.get('email')?.errors?.['required']">
+            El correo es requerido
+          </mat-error>
+          <mat-error *ngIf="employeeForm.get('email')?.errors?.['email']">
+            Formato de correo inválido
+          </mat-error>
+        </mat-form-field>
+      </div>
+      
+      <!-- Phone and Status - Side by side on larger screens, stacked on mobile -->
+      <div class="col-12 md:col-6 mb-2 md:mb-3">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Teléfono</mat-label>
+          <input matInput formControlName="phone" placeholder="Número de teléfono">
+          <mat-icon matSuffix>phone</mat-icon>
+        </mat-form-field>
+      </div>
+      
+      <div class="col-12 md:col-6 mb-2 md:mb-3">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Estado</mat-label>
+          <mat-select formControlName="status">
+            <mat-option *ngFor="let option of statusOptions" [value]="option">
+              {{ option }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="employeeForm.get('status')?.errors?.['required']">
+            El estado es requerido
+          </mat-error>
+        </mat-form-field>
+      </div>
+      
+      <!-- Photo URL -->
+      <div class="col-12 mb-2 md:mb-3">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>URL de Foto</mat-label>
+          <input matInput formControlName="photo" placeholder="https://ejemplo.com/foto.jpg">
+          <mat-icon matSuffix>image</mat-icon>
+        </mat-form-field>
+      </div>
+      
+      <!-- Photo Preview - only visible on larger screens -->
+      <div class="col-12 mb-3 text-center hidden md:block">
+        <div class="text-sm mb-1 text-600">Vista previa:</div>
+        <img [src]="employeeForm.get('photo')?.value || 'https://www.w3schools.com/w3images/avatar2.png'" 
+             alt="Vista previa" 
+             class="w-8rem h-8rem border-circle shadow-2">
+      </div>
+    </form>
+  </mat-dialog-content>
+  
+  <mat-dialog-actions align="end" class="p-2 md:p-3 border-top-1 border-300">
+    <button mat-button (click)="cancel()" [disabled]="submitting" class="mr-2">Cancelar</button>
+    <button mat-raised-button color="primary" (click)="saveChanges()" [disabled]="submitting || employeeForm.invalid">
+      <mat-icon *ngIf="!submitting" class="mr-1 hidden sm:inline-block">save</mat-icon>
+      <span *ngIf="submitting" class="spinner-border spinner-border-sm mr-1" role="status" aria-hidden="true"></span>
+      {{ submitting ? 'Guardando...' : 'Guardar Cambios' }}
+    </button>
+  </mat-dialog-actions>
+</div>
