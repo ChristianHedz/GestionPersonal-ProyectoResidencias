@@ -24,7 +24,7 @@ export class EmployeesService {
   }
 
   updateEmployee(id: number, employee: EmployeeDTO): Observable<EmployeeDTO> {
-    return this.http.put<EmployeeDTO>(`${this.environment}/employees/${id}`, employee)
+    return this.http.put<EmployeeDTO>(`${this.environment}/employee/${id}`, employee)
     .pipe(
       tap((data) => console.log('Updated employee:', data)),
       catchError((error) => throwError(() => this.ErrorHandler(error)))

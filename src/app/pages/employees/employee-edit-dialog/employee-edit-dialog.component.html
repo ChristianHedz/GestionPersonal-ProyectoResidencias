@@ -22,8 +22,8 @@
         <mat-form-field appearance="outline" class="w-full">
           <mat-label>Nombre Completo</mat-label>
           <input matInput formControlName="fullName" placeholder="Nombre completo del empleado">
-          <mat-error *ngIf="employeeForm.get('fullName')?.errors?.['required']">
-            El nombre es requerido
+          <mat-error *ngIf="employeeForm.get('fullName')?.errors">
+            {{ getFieldError('fullName') }}
           </mat-error>
         </mat-form-field>
       </div>
@@ -34,11 +34,8 @@
           <mat-label>Correo Electrónico</mat-label>
           <input matInput formControlName="email" placeholder="correo@ejemplo.com" type="email">
           <mat-icon matSuffix>email</mat-icon>
-          <mat-error *ngIf="employeeForm.get('email')?.errors?.['required']">
-            El correo es requerido
-          </mat-error>
-          <mat-error *ngIf="employeeForm.get('email')?.errors?.['email']">
-            Formato de correo inválido
+          <mat-error *ngIf="employeeForm.get('email')?.errors">
+            {{ getFieldError('email') }}
           </mat-error>
         </mat-form-field>
       </div>
@@ -49,6 +46,9 @@
           <mat-label>Teléfono</mat-label>
           <input matInput formControlName="phone" placeholder="Número de teléfono">
           <mat-icon matSuffix>phone</mat-icon>
+          <mat-error *ngIf="employeeForm.get('phone')?.errors">
+            {{ getFieldError('phone') }}
+          </mat-error>
         </mat-form-field>
       </div>
       
@@ -60,8 +60,8 @@
               {{ option }}
             </mat-option>
           </mat-select>
-          <mat-error *ngIf="employeeForm.get('status')?.errors?.['required']">
-            El estado es requerido
+          <mat-error *ngIf="employeeForm.get('status')?.errors">
+            {{ getFieldError('status') }}
           </mat-error>
         </mat-form-field>
       </div>
