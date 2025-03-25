@@ -1,8 +1,6 @@
 import { AssistDTO } from './../../interfaces/assist.interface';
 import { ValidatorsService } from './../../auth/service/validators.service';
 import { EmployeesService } from './../../service/employees.service';
-import { AuthService } from './../../auth/service/auth.service';
-import { DashboardService } from './../../service/dashboard.service';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -16,11 +14,9 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatDividerModule } from '@angular/material/divider';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { ToolbarComponent } from '../../shared/toolbar/toolbar.component';
 import 'animate.css';
-import { AuthResponse } from '../../auth/interfaces/authResponse';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder,ReactiveFormsModule, Validators } from '@angular/forms';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -115,7 +111,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.submitting = true;
     
     const assistDTO: AssistDTO = {
-      date: new Date().toISOString().split('T')[0],
+      date: new Date().toLocaleDateString('en-CA'), 
       entryTime: new Date().toLocaleTimeString('es-MX', {
         hour: '2-digit',
         minute: '2-digit',
