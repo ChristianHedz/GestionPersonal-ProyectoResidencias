@@ -10,6 +10,7 @@ import { EmployeeDTO } from '../../auth/interfaces/EmployeeDTO';
 import { ToolbarComponent } from '../../shared/toolbar/toolbar.component';
 import { EmployeeEditDialogComponent } from './employee-edit-dialog/employee-edit-dialog.component';
 import { ActivatedRoute } from '@angular/router';
+import { EmployeeCardComponent } from './employee-card/employee-card.component';
 
 @Component({
   selector: 'app-employees',
@@ -20,7 +21,8 @@ import { ActivatedRoute } from '@angular/router';
     MatButtonModule,
     MatIconModule,
     MatDialogModule,
-    ToolbarComponent
+    ToolbarComponent,
+    EmployeeCardComponent
   ],
   templateUrl: './employees.component.html',
   styleUrls: ['./employees.component.css']

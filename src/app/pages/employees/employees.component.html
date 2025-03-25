@@ -3,7 +3,6 @@
 <div class="surface-ground px-4 py-5">
   <div class="container mx-auto">
     
-    <!-- Título centrado -->
     <div class="text-center mb-5">
       <h1 class="text-3xl font-medium mb-2">Directorio de Empleados</h1>
       <p class="text-700">Información básica de nuestro equipo</p>
@@ -14,63 +13,10 @@
       
       <!-- Iterar sobre los empleados -->
       <div *ngFor="let employee of employees" class="col-12 sm:col-6 lg:col-4 xl:col-3 p-3">
-        <mat-card class="employee-card h-full shadow-2 border-round-md blurs">
-          <!-- Botón de edición posicionado en la esquina superior derecha -->
-          <button mat-icon-button color="primary" class="edit-button" 
-                  style="position: absolute; top: 8px; right: 8px; z-index: 1;"
-                  (click)="openEditDialog(employee, $event)">
-            <mat-icon>edit</mat-icon>
-          </button>
-          
-          <div class="employee-header p-3 text-center">
-            <!-- Foto de perfil -->
-            <div class="avatar-container mb-3">
-              <img class="avatar w-8rem h-8rem border-circle mx-auto shadow-2" 
-                   [src]="employee.photo || 'https://www.w3schools.com/w3images/avatar2.png'" 
-                   [alt]="employee.fullName">
-            </div>
-            
-            <!-- Información básica -->
-            <h2 class="name text-xl font-bold mb-2">{{ employee.fullName }}</h2>
-            <div class="employee-status mb-3">
-              <span class="status-badge px-2 py-1 border-round text-sm"
-                    [ngClass]="{
-                      'bg-green-100 text-green-700': employee.status === 'Activo',
-                      'bg-orange-100 text-orange-700': employee.status === 'Remoto',
-                      'bg-blue-100 text-blue-700': employee.status === 'Vacaciones',
-                      'bg-purple-100 text-purple-700': employee.status === 'Proyecto Especial',
-                      'bg-gray-100 text-gray-700': !['Activo', 'Remoto', 'Vacaciones', 'Proyecto Especial'].includes(employee.status)
-                    }">
-                <i class="pi" 
-                   [ngClass]="{
-                     'pi-check-circle': employee.status === 'Activo',
-                     'pi-home': employee.status === 'Remoto',
-                     'pi-calendar': employee.status === 'Vacaciones',
-                     'pi-briefcase': employee.status === 'Proyecto Especial',
-                     'pi-user': !['Activo', 'Remoto', 'Vacaciones', 'Proyecto Especial'].includes(employee.status)
-                   }"></i>
-                {{ employee.status }}
-              </span>
-            </div>
-            
-            <!-- Información de contacto -->
-            <div class="contact-info text-left p-3 border-top-1 border-300">
-              <div class="flex align-items-center mb-2">
-                <i class="pi pi-envelope text-600 mr-2"></i>
-                <span class="text-sm">{{ employee.email }}</span>
-              </div>
-              <div class="flex align-items-center">
-                <i class="pi pi-phone text-600 mr-2"></i>
-                <span class="text-sm">{{ employee.phone || 'No ha registrado telefono' }}</span>
-              </div>
-            </div>
-            
-            <!-- ID en formato discreto -->
-            <div class="employee-id text-right">
-              <span class="text-xs text-500">ID: {{ employee.id }}</span>
-            </div>
-          </div>
-        </mat-card>
+        <app-employee-card 
+          [employee]="employee"
+          [onEdit]="openEditDialog.bind(this)">
+        </app-employee-card>
       </div>
       
       <!-- Mensaje si no hay empleados -->
