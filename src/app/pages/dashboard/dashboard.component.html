@@ -25,17 +25,21 @@
               </div>
               
               <!-- Email Input -->
-              <div class="w-full sm:w-10 md:w-8 mb-4">
+              <form class="w-full sm:w-10 md:w-10 mb-4" [formGroup]="assistForm">
                 <mat-form-field appearance="outline" class="w-full">
                   <mat-label>Introduce tu correo</mat-label>
-                  <input matInput type="email">
+                  <input matInput type="email" formControlName="email" >
                   <mat-icon matSuffix>email</mat-icon>
+                  <mat-error *ngIf="validatorsService.isValidField(assistForm, 'email')">
+                    {{ validatorsService.getFieldError(assistForm, 'email') }}
+                  </mat-error>
                 </mat-form-field>
-              </div>
+              </form>
               
               <!-- Registration Button -->
               <div class="w-full sm:w-10 md:w-8">
-                <button mat-raised-button color="primary" class="w-full p-3">
+                <button mat-raised-button color="primary" class="w-full p-3"
+                (click)="registerAssist()" [disabled]="submitting || assistForm.invalid">
                   REGISTRAR
                 </button>
               </div>

@@ -4,6 +4,7 @@ import { inject, Injectable } from '@angular/core';
 import { catchError, Observable, tap, throwError } from 'rxjs';
 import { ErrorHandlerService } from './error-handler.service';
 import { EmployeeDTO } from '../auth/interfaces/EmployeeDTO';
+import { AssistDTO } from '../interfaces/assist.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -30,4 +31,14 @@ export class EmployeesService {
       catchError((error) => throwError(() => this.ErrorHandler(error)))
     );
   }
+
+  registerAssist(assistData: AssistDTO): Observable<AssistDTO> {
+    console.log('Sending assist data:', assistData);
+    return this.http.post<AssistDTO>(`${this.environment}/assist`, assistData)
+    .pipe(
+      tap((data) => console.log('Assist registered:', data)),
+      catchError((error) => throwError(() => this.ErrorHandler(error)))
+    )
+  }
+
 }

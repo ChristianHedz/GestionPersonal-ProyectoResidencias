@@ -12,6 +12,19 @@ export class ValidatorsService {
     return form.controls[field].errors && form.controls[field].touched;
   }
 
+  getFieldError(form: FormGroup, field: string): string | null {
+    const control = form.get(field);
+    
+    if (!control || !control.errors || !control.touched) return null;
+    
+    if (control.errors['required']) return 'Este campo es requerido';
+    if (control.errors['pattern']) {
+      if (field === 'email') return 'Ingresa un correo electrónico válido';
+      return 'El formato ingresado no es válido';
+    }
+    return 'Campo inválido';
+  }
+
 
   public isFieldOneEqualFieldTwo( field1: string, field2: string ) {
 

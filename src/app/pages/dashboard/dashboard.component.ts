@@ -1,3 +1,6 @@
+import { AssistDTO } from './../../interfaces/assist.interface';
+import { ValidatorsService } from './../../auth/service/validators.service';
+import { EmployeesService } from './../../service/employees.service';
 import { AuthService } from './../../auth/service/auth.service';
 import { DashboardService } from './../../service/dashboard.service';
 import { MatMenuModule } from '@angular/material/menu';
@@ -17,6 +20,8 @@ import { HttpClient } from '@angular/common/http';
 import { ToolbarComponent } from '../../shared/toolbar/toolbar.component';
 import 'animate.css';
 import { AuthResponse } from '../../auth/interfaces/authResponse';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-dashboard',
@@ -34,7 +39,8 @@ import { AuthResponse } from '../../auth/interfaces/authResponse';
     MatDividerModule,
     RouterModule, 
     CommonModule,
-    ToolbarComponent
+    ToolbarComponent,
+    ReactiveFormsModule
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
@@ -44,11 +50,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
   currentTime: string = '';
   currentDate: string = '';
   currentView = signal<'boton' | 'codigo'>('boton');
+  submitting: boolean = false;
   private timerInterval: any;
-  private timeRecordService = inject(HttpClient);
-  private dashboardService = inject(DashboardService);
-  private authService = inject(AuthService);
-  currentUser = computed(() => this.authService.currentUser());
+  private EmployeesService = inject(EmployeesService);
+  validatorsService = inject(ValidatorsService);
+  private fb = inject(FormBuilder);
+
+
+  readonly assistForm = this.fb.group({
+    email: [' ', [Validators.required, Validators.pattern(this.validatorsService.emailPattern)]],
+  });
+
+  email = computed(() => this.assistForm.controls.email);
 
   ngOnInit(): void {
     // Actualizar inmediatamente al iniciar
@@ -88,24 +101,40 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.currentDate = this.currentDate.charAt(0).toUpperCase() + this.currentDate.slice(1);
   }
 
+
   onViewChange(view: 'boton' | 'codigo'): void {
     this.currentView.set(view);
   }
 
-  sendTimeToBackend(): void {
-    const timeData = {
-      timestamp: new Date().toISOString(),
-      time: this.currentTime,
-      date: this.currentDate
+  registerAssist(): void {
+
+    if (this.assistForm.invalid) {
+      this.assistForm.markAllAsTouched();
+      return;
+    }
+    this.submitting = true;
+    
+    const assistDTO: AssistDTO = {
+      date: new Date().toISOString().split('T')[0],
+      entryTime: new Date().toLocaleTimeString('es-MX', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      }),
+      emailEmployee: this.email().value || ''
     };
   
-    this.dashboardService.recordTime(timeData)
+    this.EmployeesService.registerAssist(assistDTO)
       .subscribe({
         next: (response) => {
-          console.log('Hora registrada exitosamente', response);
+          this.submitting = false;
+          console.log('Hora de entrada registrada exitosamente', response);
+          Swal.fire('¡Hora de entrada registrada exitosamente!', 'Has registrado tu hora de entrada correctamente', 'success');
         },
         error: (error) => {
-          console.error('Error al registrar hora', error);
+          this.submitting = false;
+          console.error('Error al registrar hora de entrada', error);
+          Swal.fire('¡Error al registrar hora de entrada!', 'Por favor, intenta nuevamente', 'error');
         }
       });
   }
