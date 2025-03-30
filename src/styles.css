@@ -5,8 +5,12 @@ body {
   font-weight: 400;
   font-style: static;
   color: white;
-  background: -webkit-linear-gradient(90deg, #000000,#1e0d21,#30008a,#210240);
-  background: linear-gradient(90deg, #000000,#1e0d21,#30008a,#210240);
+  background-image: url("assets/img/blue-and-purple.jpg");
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: cover; 
+  /* background: -webkit-linear-gradient(90deg, #000000,#1e0d21,#30008a,#210240);
+  background: linear-gradient(90deg, #000000,#1e0d21,#30008a,#210240); */
   position: relative;
 }
 

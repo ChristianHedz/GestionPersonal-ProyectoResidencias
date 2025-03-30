@@ -6,7 +6,6 @@ import { AuthResponse } from '../interfaces/authResponse';
 import { LoginResponse, registerResponse } from '../interfaces';
 import { environment } from '../../../env/enviroments';
 import { catchError, map, Observable, of, tap, throwError } from 'rxjs';
-import { ApiError } from '../interfaces/apiError';
 import { ErrorHandlerService } from '../../service/error-handler.service';
 
 @Injectable({
@@ -32,17 +31,16 @@ export class AuthService {
     this.checkAuthStatus();
   }
 
-    private checkAuthStatus(): void {
+  private checkAuthStatus(): void {
     this.isLogged().subscribe();
   }
 
-    isLogged(): Observable<boolean> {
+  isLogged(): Observable<boolean> {
     const isLogged = localStorage.getItem(this.STORAGE_KEY) === AuthStatus.authenticated;
     this._authStatus.set(isLogged ? AuthStatus.authenticated : AuthStatus.notAuthenticated);
     
-    console.log('Usuario autenticado pendiente');
     if (!isLogged) return of(false);
-    
+    console.log('Usuario autenticado pendiente');
     return this.http.get<AuthResponse>(`${this.url}/profile`)
       .pipe(
         tap(employee => this._currentUser.set(employee)),
@@ -56,7 +54,7 @@ export class AuthService {
       );
   }
 
-    login(credentials: LoginResponse): Observable<AuthResponse> {
+  login(credentials: LoginResponse): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.url}/login`, credentials)
       .pipe(
         tap(employee => this._currentUser.set(employee)),
@@ -68,7 +66,7 @@ export class AuthService {
       );
   }
 
-    registerUsers(credentials: registerResponse): Observable<AuthResponse> {
+  registerUsers(credentials: registerResponse): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.url}/register`, credentials)
       .pipe(
         tap(employee => this._currentUser.set(employee)),
@@ -80,7 +78,7 @@ export class AuthService {
       );
   }
 
-    logout(): Observable<void> {
+  logout(): Observable<void> {
     return this.http.post<void>(`${this.url}/logout`, null)
       .pipe(
         tap(() => this.handleLogout()),
@@ -88,18 +86,16 @@ export class AuthService {
     )
   }
 
-    private handleSuccessfulAuth(): void {
+  private handleSuccessfulAuth(): void {
     this._authStatus.set(AuthStatus.authenticated);
     localStorage.setItem(this.STORAGE_KEY, AuthStatus.authenticated);
   }
 
-    private handleLogout(): void {
+  private handleLogout(): void {
     this._authStatus.set(AuthStatus.notAuthenticated);
     this._currentUser.set(null);
     localStorage.removeItem(this.STORAGE_KEY);
   }
 
-
-  
 
 }
