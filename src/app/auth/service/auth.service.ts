@@ -1,10 +1,9 @@
+import { environment } from './../../../env/enviroments';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { Router } from '@angular/router';
 import { AuthStatus } from '../interfaces/authStatus.enum';
 import { AuthResponse } from '../interfaces/authResponse';
 import { LoginResponse, registerResponse } from '../interfaces';
-import { environment } from '../../../env/enviroments';
 import { catchError, map, Observable, of, tap, throwError } from 'rxjs';
 import { ErrorHandlerService } from '../../service/error-handler.service';
 
@@ -50,6 +49,28 @@ export class AuthService {
         catchError(() => {
           this.handleLogout();
           return of(false);
+        })
+      );
+  }
+
+
+  googleLogin(token: string):Observable<AuthResponse> {
+    console.log('se recibio el token: ' + {token});
+    return this.http.post<AuthResponse>(this.url + '/users/authGoogle',{token}).pipe(
+      tap((userResp: AuthResponse) => {
+        console.log({userResp});
+      }),
+    )
+  }
+
+  validateGoogleToken(token: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.url}/auth/google`, { token })
+      .pipe(
+        tap(employee => this._currentUser.set(employee)),
+        tap(() => this.handleSuccessfulAuth()),
+        catchError((error) => {
+          this.handleLogout();
+          return throwError(() => this.errorHandler(error));
         })
       );
   }

@@ -11,17 +11,17 @@ const routes: Routes = [
   {
     path: 'inicio',
     component: DashboardComponent,
-    canMatch: [isAuthGuard]
+    // canMatch: [isAuthGuard]
   },
   {
     path: 'info',
     component: InfoComponent,
-    canMatch: [isAuthGuard]
+    // canMatch: [isAuthGuard]
   },
   {
     path: 'empleados',
     component: EmployeesComponent,
-    canMatch: [isAuthGuard, isAdminGuard]
+    // canMatch: [isAuthGuard, isAdminGuard]
   },
   {
     path: '',
