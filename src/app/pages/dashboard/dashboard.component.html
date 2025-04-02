@@ -20,8 +20,8 @@
             <div class="flex flex-column align-items-center">
               <!-- Time Display -->
               <div class="time-display text-center mb-4">
-                <h1 class="text-5xl font-light mb-2">{{ currentTime }}</h1>
-                <h3 class="font-light text-600 m-0">{{ currentDate }}</h3>
+                <h1 class="text-5xl font-light mb-2">{{ currentTime() }}</h1>
+                <h3 class="font-light text-600 m-0">{{ currentDate() }}</h3>
               </div>
               
               <!-- Email Input -->
@@ -55,8 +55,54 @@
         <div class="col-12 sm:col-10 md:col-8 lg:col-6">
           <div class="blur">
             <div class="p-3">
-              <h2 class="mb-3">Código de la Página</h2>
+              <h2 class="mb-3 text-center">Escaneo de Código QR</h2>
               <mat-divider class="mb-3"></mat-divider>
+              
+              <!-- Scanner Area -->
+              <div class="scanner-container">
+                <div class="scanner-message text-center mb-2" *ngIf="!qrResult()">
+                  <p>Coloca un código QR que contenga un correo de empleado frente a la cámara</p>
+                  <mat-icon class="scanner-icon">qr_code_scanner</mat-icon>
+                </div>
+                
+                <div class="scanner-result text-center mb-2" *ngIf="qrResult()">
+                  <h3>Correo detectado:</h3>
+                  <p class="email-result">{{ qrResult() }}</p>
+                  <mat-icon class="success-icon">check_circle</mat-icon>
+                </div>
+                
+                <!-- QR Scanner Component -->
+                <div class="scanner-wrapper" [ngClass]="{'scanning': !qrResult(), 'scanned': qrResult()}">
+                  <zxing-scanner 
+                    *ngIf="scannerEnabled()"
+                    [enable]="scannerEnabled()"
+                    [formats]="formatsEnabled"
+                    (camerasFound)="onCamerasFound($event)"
+                    (scanSuccess)="onCodeResult($event)"
+                    (scanError)="onCameraError($event)"
+                    [tryHarder]="true"
+                    [device]="currentDevice || undefined">
+                  </zxing-scanner>
+                </div>
+                
+                <!-- No cameras found message -->
+                <div class="no-camera text-center mt-4" *ngIf="scannerEnabled() && availableDevices && availableDevices.length === 0">
+                  <p class="error-text">No se encontraron cámaras disponibles.</p>
+                  <p>Asegúrate de conceder permisos de cámara y tener una cámara conectada.</p>
+                </div>
+                
+                <!-- Scanner controls -->
+                <div class="scanner-controls mt-3 text-center">
+                  <button 
+                    mat-raised-button 
+                    color="primary" 
+                    [disabled]="submitting()"
+                    (click)="toggleCamera()">
+                    {{ scannerEnabled() ? 'Desactivar Cámara' : 'Activar Cámara' }}
+                    <mat-icon>{{ scannerEnabled() ? 'videocam_off' : 'videocam' }}</mat-icon>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>

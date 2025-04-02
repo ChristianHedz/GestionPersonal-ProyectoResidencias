@@ -4,7 +4,7 @@ import { EmployeesService } from './../../service/employees.service';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
@@ -16,8 +16,12 @@ import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ToolbarComponent } from '../../shared/toolbar/toolbar.component';
 import 'animate.css';
-import { FormBuilder,ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import Swal from 'sweetalert2';
+import { ZXingScannerModule } from '@zxing/ngx-scanner';
+import { BarcodeFormat } from '@zxing/library';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-dashboard',
@@ -36,101 +40,209 @@ import Swal from 'sweetalert2';
     RouterModule, 
     CommonModule,
     ToolbarComponent,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    ZXingScannerModule
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
-
 })
 export class DashboardComponent implements OnInit, OnDestroy {
-  currentTime: string = '';
-  currentDate: string = '';
+  // Propiedades de tiempo y estado
+  currentTime = signal<string>('');
+  currentDate = signal<string>('');
   currentView = signal<'boton' | 'codigo'>('boton');
-  submitting: boolean = false;
+  submitting = signal<boolean>(false);
+  
+  // Propiedades del escáner QR
+  scannerEnabled = signal<boolean>(false);
+  availableDevices: MediaDeviceInfo[] = [];
+  currentDevice: MediaDeviceInfo | null = null;
+  qrResult = signal<string>('');
+  formatsEnabled: BarcodeFormat[] = [
+    BarcodeFormat.QR_CODE,
+  ];
+  
+  // Servicios y dependencias
   private timerInterval: any;
-  private EmployeesService = inject(EmployeesService);
-  validatorsService = inject(ValidatorsService);
+  private employeesService = inject(EmployeesService);
+  private destroyRef = inject(DestroyRef);
   private fb = inject(FormBuilder);
+  public validatorsService = inject(ValidatorsService);
 
-
+  // Formulario de asistencia
   readonly assistForm = this.fb.group({
-    email: [' ', [Validators.required, Validators.pattern(this.validatorsService.emailPattern)]],
+    email: ['', [Validators.required, Validators.pattern(this.validatorsService.emailPattern)]],
   });
 
-  email = computed(() => this.assistForm.controls.email);
+  // Proyección del email como señal
+  email = toSignal(this.assistForm.controls.email.valueChanges, { initialValue: '' });
 
+  /**
+   * Inicializa el componente y configura el temporizador para actualizar la hora
+   */
   ngOnInit(): void {
-    // Actualizar inmediatamente al iniciar
     this.updateTime();
-    
-    // Configurar intervalo para actualizar cada segundo
-    this.timerInterval = setInterval(() => {
-      this.updateTime();
-    }, 1000);
+    this.timerInterval = setInterval(() => this.updateTime(), 1000);
   }
 
+  /**
+   * Limpia los recursos al destruir el componente
+   */
   ngOnDestroy(): void {
-    // Limpiar el intervalo cuando el componente se destruye
     if (this.timerInterval) {
       clearInterval(this.timerInterval);
     }
   }
 
+  /**
+   * Actualiza la hora y fecha actual
+   */
   updateTime(): void {
     const now = new Date();
     
     // Formato hora: HH:MM
-    this.currentTime = now.toLocaleTimeString('es-MX', {
+    this.currentTime.set(now.toLocaleTimeString('es-MX', {
       hour: '2-digit',
       minute: '2-digit',
       hour12: false
-    });
+    }));
     
     // Formato fecha: Día de la semana, Mes DD
-    this.currentDate = now.toLocaleDateString('es-MX', {
+    const formattedDate = now.toLocaleDateString('es-MX', {
       weekday: 'long', 
       month: 'long', 
       day: 'numeric'
     });
     
     // Capitalizar primera letra y formatear
-    this.currentDate = this.currentDate.charAt(0).toUpperCase() + this.currentDate.slice(1);
+    this.currentDate.set(formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1));
   }
 
-
+  /**
+   * Cambia entre las vistas de botón y código QR
+   */
   onViewChange(view: 'boton' | 'codigo'): void {
     this.currentView.set(view);
+    this.scannerEnabled.set(view === 'codigo');
   }
 
-  registerAssist(): void {
+  /**
+   * Activa o desactiva la cámara manualmente
+   */
+  toggleCamera(): void {
+    // Invertir el estado del scanner
+    this.scannerEnabled.update(enabled => !enabled);
+    
+    // Si desactivamos la cámara, también limpiamos el resultado del escaneo
+    if (!this.scannerEnabled()) {
+      this.qrResult.set('');
+    }
+  }
 
+  /**
+   * Maneja la detección de cámaras disponibles
+   */
+  onCamerasFound(devices: MediaDeviceInfo[]): void {
+    this.availableDevices = devices;
+    
+    if (devices && devices.length > 0) {
+      this.currentDevice = devices[0];
+    }
+  }
+
+  /**
+   * Maneja errores en la inicialización de la cámara
+   */
+  onCameraError(error: Error): void {
+    console.error('Camera error:', error);
+    Swal.fire('Error de cámara', 'No se pudo acceder a la cámara. Por favor, verifica que has concedido los permisos necesarios.', 'error');
+  }
+
+  /**
+   * Procesa el resultado del escaneo de código QR
+   */
+  onCodeResult(result: string): void {
+    if (result !== this.qrResult() && result) {
+      this.qrResult.set(result);
+      
+      if (this.isValidEmail(result)) {
+        this.registerAttendance(result);
+      } else {
+        Swal.fire('Formato inválido', 'El código QR no contiene un correo electrónico válido.', 'warning');
+      }
+    }
+  }
+
+  /**
+   * Valida si una cadena es un correo electrónico válido
+   */
+  private isValidEmail(email: string): boolean {
+    const emailPattern = new RegExp(this.validatorsService.emailPattern);
+    return emailPattern.test(email);
+  }
+
+  /**
+   * Registra la asistencia mediante el formulario manual
+   */
+  registerAssist(): void {
     if (this.assistForm.invalid) {
       this.assistForm.markAllAsTouched();
       return;
     }
-    this.submitting = true;
     
+    const emailValue = this.assistForm.controls.email.value;
+    if (emailValue) {
+      this.registerAttendance(emailValue);
+    }
+  }
+
+  /**
+   * Registra la asistencia del empleado (usado por QR y formulario)
+   */
+  private registerAttendance(email: string): void {
+    this.submitting.set(true);
+    
+    const now = new Date();
     const assistDTO: AssistDTO = {
-      date: new Date().toLocaleDateString('en-CA'), 
-      entryTime: new Date().toLocaleTimeString('es-MX', {
+      date: now.toLocaleDateString('en-CA'), 
+      entryTime: now.toLocaleTimeString('es-MX', {
         hour: '2-digit',
         minute: '2-digit',
         hour12: false
       }),
-      emailEmployee: this.email().value || ''
+      emailEmployee: email
     };
   
-    this.EmployeesService.registerAssist(assistDTO)
+    this.employeesService.registerAssist(assistDTO)
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (response) => {
-          this.submitting = false;
-          console.log('Hora de entrada registrada exitosamente', response);
-          Swal.fire('¡Hora de entrada registrada exitosamente!', 'Has registrado tu hora de entrada correctamente', 'success');
+        next: () => {
+          this.submitting.set(false);
+          
+          const isQrMode = this.currentView() === 'codigo';
+          
+          if (isQrMode) {
+            Swal.fire({
+              title: '¡Asistencia registrada!',
+              text: `Se ha registrado la asistencia para ${email}`,
+              icon: 'success',
+              timer: 3000,
+              timerProgressBar: true
+            });
+            
+            // Resetear escáner después del registro exitoso
+            setTimeout(() => this.qrResult.set(''), 3000);
+          } else {
+            Swal.fire('¡Hora de entrada registrada exitosamente!', 
+                     'Has registrado tu hora de entrada correctamente', 
+                     'success');
+            this.assistForm.reset();
+          }
         },
         error: (error) => {
-          this.submitting = false;
-          console.error('Error al registrar hora de entrada', error);
-          Swal.fire('¡Error al registrar hora de entrada!', 'Por favor, intenta nuevamente', 'error');
+          this.submitting.set(false);
+          console.error('Error al registrar asistencia:', error);
+          Swal.fire('Error', 'No se pudo registrar la asistencia. Intente nuevamente.', 'error');
         }
       });
   }
