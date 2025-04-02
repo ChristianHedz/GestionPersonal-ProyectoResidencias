@@ -13,6 +13,7 @@ import { ValidatorsService } from '../../service/validators.service';
 import Swal from 'sweetalert2';
 import { LoginResponse } from '../../interfaces';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { SocialLoginComponent } from '../social-login/social-login.component';
 import { GoogleSigninButtonModule, SocialLoginModule, SocialAuthService } from '@abacritt/angularx-social-login';
 
 @Component({
@@ -29,18 +30,18 @@ import { GoogleSigninButtonModule, SocialLoginModule, SocialAuthService } from '
     MatCheckboxModule,
     GoogleSigninButtonModule,
     SocialLoginModule,
-    RouterModule
+    RouterModule,
+    SocialLoginComponent
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent{
     
     private validatorsService = inject(ValidatorsService);
     private fb = inject(FormBuilder);
     private router = inject(Router);
     private authService = inject(AuthService);
-    private socialAuthService = inject(SocialAuthService);
     
     public loginForm = this.fb.group({
       email: ['', [
@@ -52,25 +53,7 @@ export class LoginComponent implements OnInit {
 
     email = computed(() => this.loginForm.controls.email);
     password = computed(() => this.loginForm.controls.password);
-
-    ngOnInit() {
-      this.socialAuthService.authState.subscribe({
-        next: (result) => {
-          this.authService.googleLogin(result.idToken).subscribe((res) => {
-            if (res) {
-              Swal.fire('Bienvenido!', 'Has iniciado sesión correctamente', 'success');
-              this.router.navigateByUrl('/home');
-            }
-          });
-          console.log(result);
-        },
-        error: (err) => {
-          console.error(err);
-        },
-      });
-    }
     
-
     login(): void {
       if (this.loginForm.invalid) {
         this.loginForm.markAllAsTouched();

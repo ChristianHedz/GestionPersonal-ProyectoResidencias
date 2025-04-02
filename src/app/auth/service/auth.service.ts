@@ -6,6 +6,15 @@ import { AuthResponse } from '../interfaces/authResponse';
 import { LoginResponse, registerResponse } from '../interfaces';
 import { catchError, map, Observable, of, tap, throwError } from 'rxjs';
 import { ErrorHandlerService } from '../../service/error-handler.service';
+import { SocialAuthService } from '@abacritt/angularx-social-login';
+
+const API_ENDPOINTS = {
+  LOGIN: '/login',
+  REGISTER: '/register',
+  LOGOUT: '/logout',
+  PROFILE: '/profile',
+  GOOGLE_AUTH: '/authGoogle'
+};
 
 @Injectable({
   providedIn: 'root'
@@ -15,14 +24,15 @@ export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly url: string = environment.urlApi;
   private readonly STORAGE_KEY = 'isLogged';
-  private readonly handleError = inject(ErrorHandlerService)
+  private readonly handleError = inject(ErrorHandlerService);
   private readonly errorHandler = this.handleError.handleError;
+  private readonly socialAuthService = inject(SocialAuthService);
 
   private _authStatus = signal<AuthStatus>(AuthStatus.checking);
-  public authStatus = computed(() => this._authStatus());
+  public authStatus = this._authStatus.asReadonly();
 
   private _currentUser = signal<AuthResponse | null>(null);
-  public currentUser = computed(() => this._currentUser());
+  public currentUser = this._currentUser.asReadonly();
 
   public isAdmin = computed(() => this.currentUser()?.role === 'ADMIN');
 
@@ -40,7 +50,7 @@ export class AuthService {
     
     if (!isLogged) return of(false);
     console.log('Usuario autenticado pendiente');
-    return this.http.get<AuthResponse>(`${this.url}/profile`)
+    return this.http.get<AuthResponse>(`${this.url}${API_ENDPOINTS.PROFILE}`)
       .pipe(
         tap(employee => this._currentUser.set(employee)),
         tap(() => this._authStatus.set(AuthStatus.authenticated)),
@@ -53,22 +63,16 @@ export class AuthService {
       );
   }
 
-
-  googleLogin(token: string):Observable<AuthResponse> {
-    console.log('se recibio el token: ' + {token});
-    return this.http.post<AuthResponse>(this.url + '/users/authGoogle',{token}).pipe(
-      tap((userResp: AuthResponse) => {
-        console.log({userResp});
-      }),
-    )
-  }
-
-  validateGoogleToken(token: string): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.url}/auth/google`, { token })
+  googleLogin(token: string): Observable<AuthResponse> {
+    if (!token) {
+      return throwError(() => new Error('Token de Google no proporcionado'));
+    }
+    
+    return this.http.post<AuthResponse>(`${this.url}${API_ENDPOINTS.GOOGLE_AUTH}`, { token })
       .pipe(
         tap(employee => this._currentUser.set(employee)),
         tap(() => this.handleSuccessfulAuth()),
-        catchError((error) => {
+        catchError((error: HttpErrorResponse) => {
           this.handleLogout();
           return throwError(() => this.errorHandler(error));
         })
@@ -76,7 +80,7 @@ export class AuthService {
   }
 
   login(credentials: LoginResponse): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.url}/login`, credentials)
+    return this.http.post<AuthResponse>(`${this.url}${API_ENDPOINTS.LOGIN}`, credentials)
       .pipe(
         tap(employee => this._currentUser.set(employee)),
         tap(() => this.handleSuccessfulAuth()),
@@ -88,7 +92,7 @@ export class AuthService {
   }
 
   registerUsers(credentials: registerResponse): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.url}/register`, credentials)
+    return this.http.post<AuthResponse>(`${this.url}${API_ENDPOINTS.REGISTER}`, credentials)
       .pipe(
         tap(employee => this._currentUser.set(employee)),
         tap(() => this.handleSuccessfulAuth()),
@@ -100,11 +104,16 @@ export class AuthService {
   }
 
   logout(): Observable<void> {
-    return this.http.post<void>(`${this.url}/logout`, null)
+    try {
+      this.socialAuthService.signOut();
+    } catch (error) {
+      console.error('Error signing out from Google:', error);
+    }
+    return this.http.post<void>(`${this.url}${API_ENDPOINTS.LOGOUT}`, {})
       .pipe(
         tap(() => this.handleLogout()),
         catchError((error) => throwError(() => this.errorHandler(error)))
-    )
+    );
   }
 
   private handleSuccessfulAuth(): void {
@@ -112,11 +121,10 @@ export class AuthService {
     localStorage.setItem(this.STORAGE_KEY, AuthStatus.authenticated);
   }
 
+
   private handleLogout(): void {
     this._authStatus.set(AuthStatus.notAuthenticated);
     this._currentUser.set(null);
     localStorage.removeItem(this.STORAGE_KEY);
   }
-
-
 }

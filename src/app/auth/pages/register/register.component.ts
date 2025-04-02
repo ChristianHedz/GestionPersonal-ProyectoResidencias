@@ -13,13 +13,15 @@ import { CommonModule } from '@angular/common';
 import { AuthResponse } from '../../interfaces/authResponse';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { NgxSpinnerModule } from 'ngx-spinner';
+import { SocialLoginComponent } from '../social-login/social-login.component';
 
 
 
 @Component({
   selector: 'app-register',
   imports: [ReactiveFormsModule,MatFormFieldModule,MatInputModule,
-      MatButtonModule,MatIconModule,MatButtonModule,RouterModule,CommonModule,NgxSpinnerModule],
+      MatButtonModule,MatIconModule,MatButtonModule,RouterModule,CommonModule,
+      NgxSpinnerModule,SocialLoginComponent],
   templateUrl: './register.component.html',
   styleUrl: './register.component.css'
 })
