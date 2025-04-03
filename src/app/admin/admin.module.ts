@@ -4,8 +4,8 @@ import { RouterModule, Routes } from '@angular/router';
 import { DashboardComponent } from '../pages/dashboard/dashboard.component';
 import { InfoComponent } from '../pages/info/info.component';
 import { EmployeesComponent } from '../pages/employees/employees.component';
-import { isAuthGuard } from '../auth/guards/is-auth.guard';
-import { isAdminGuard } from '../auth/guards/is-admin.guard';
+import { AttendanceComponent } from '../pages/attendance/attendance.component';
+
 
 const routes: Routes = [
   {
@@ -21,7 +21,15 @@ const routes: Routes = [
   {
     path: 'empleados',
     component: EmployeesComponent,
-    // canMatch: [isAuthGuard, isAdminGuard]
+    // canMatch: [isAdminGuard]
+    // resolve: {
+    //   employees: EmployeesResolver
+    // }
+  },
+  {
+    path: 'asistencias',
+    component: AttendanceComponent,
+    // canMatch: [isAuthGuard]
   },
   {
     path: '',
@@ -33,10 +41,7 @@ const routes: Routes = [
 @NgModule({
   imports: [
     CommonModule,
-    RouterModule.forChild(routes),
-    DashboardComponent,
-    InfoComponent,
-    EmployeesComponent
+    RouterModule.forChild(routes)
   ]
 })
-export class AdminModule { } 
+export class AdminModule { }
