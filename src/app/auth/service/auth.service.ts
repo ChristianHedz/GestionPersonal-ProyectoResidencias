@@ -67,7 +67,7 @@ export class AuthService {
     if (!token) {
       return throwError(() => new Error('Token de Google no proporcionado'));
     }
-    
+  
     return this.http.post<AuthResponse>(`${this.url}${API_ENDPOINTS.GOOGLE_AUTH}`, { token })
       .pipe(
         tap(employee => this._currentUser.set(employee)),

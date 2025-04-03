@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Component,OnInit, computed, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -53,7 +52,6 @@ import { ToolbarComponent } from '../../shared/toolbar/toolbar.component';
 export class AttendanceComponent implements OnInit {
   private readonly attendanceService = inject(EmployeeAttendanceService);
   private readonly employeesService = inject(EmployeesService);
-  private readonly destroyRef = inject(DestroyRef);
 
   // Señales para el estado del componente
   private readonly _attendanceData = signal<AssistDetailsDTO[]>([]);
@@ -93,7 +91,6 @@ export class AttendanceComponent implements OnInit {
     
     // Suscripción a cambios en el formulario de filtros
     this.filterForm.get('filterType')?.valueChanges
-      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(filterType => {
         if (filterType === 'recent') {
           this.loadRecentAttendance();
@@ -168,7 +165,6 @@ export class AttendanceComponent implements OnInit {
    */
   private loadEmployees(): void {
     this.employeesService.listAllEmployees()
-      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (employees: EmployeeDTO[]) => this._employees.set(employees),
         error: (err: any) => this._error.set(err)
@@ -181,7 +177,6 @@ export class AttendanceComponent implements OnInit {
   private loadAllAttendance(page: number = 0, size: number = 20): void {
     this._loading.set(true);
     this.attendanceService.getAllAttendance(page, size)
-      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data: AssistDetailsDTO[]) => {
           this._attendanceData.set(data);
@@ -201,7 +196,6 @@ export class AttendanceComponent implements OnInit {
   private loadRecentAttendance(size: number = 20): void {
     this._loading.set(true);
     this.attendanceService.getRecentAttendance(size)
-      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data: AssistDetailsDTO[]) => {
           this._attendanceData.set(data);
@@ -222,7 +216,6 @@ export class AttendanceComponent implements OnInit {
   private filterByEmployee(employeeId: number, page: number = 0, size: number = 20): void {
     this._loading.set(true);
     this.attendanceService.getAttendanceByEmployee(employeeId, page, size)
-      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data: AssistDetailsDTO[]) => {
           this._attendanceData.set(data);
@@ -243,7 +236,6 @@ export class AttendanceComponent implements OnInit {
   private filterByDate(date: string, page: number = 0, size: number = 20): void {
     this._loading.set(true);
     this.attendanceService.getAttendanceByDate(date, page, size)
-      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data: AssistDetailsDTO[]) => {
           this._attendanceData.set(data);

@@ -1,14 +1,13 @@
 import { ValidatorsService } from './../../../auth/service/validators.service';
-import { Component, DestroyRef, inject, Inject, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component,inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { EmployeeDTO } from '../../../auth/interfaces/EmployeeDTO';
 import { EmployeesService } from '../../../service/employees.service';
 import Swal from 'sweetalert2';
@@ -34,7 +33,6 @@ export class EmployeeEditDialogComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly dialogRef = inject(MatDialogRef<EmployeeEditDialogComponent>);
   private readonly employeesService = inject(EmployeesService);
-  private readonly destroyRef = inject(DestroyRef);
   private readonly validatorsService = inject(ValidatorsService);
   public  readonly data = inject(MAT_DIALOG_DATA) as { employee: EmployeeDTO };
   statusOptions = ['ACTIVO', 'Remoto', 'Vacaciones', 'Proyecto Especial'];
@@ -49,7 +47,6 @@ export class EmployeeEditDialogComponent implements OnInit {
     status: ['ACTIVO', [Validators.required]]
   });
   
-
   ngOnInit(): void {
     // Debug para ver la estructura del diálogo
     console.log('Dialog container:', document.querySelector('.mat-mdc-dialog-container'));
@@ -84,7 +81,6 @@ export class EmployeeEditDialogComponent implements OnInit {
     };
 
     this.employeesService.updateEmployee(this.data.employee.id, updatedEmployee)
-      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response) => {
           this.submitting = false;

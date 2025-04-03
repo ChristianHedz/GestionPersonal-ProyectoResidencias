@@ -1,11 +1,10 @@
 import { EmployeesService } from './../../service/employees.service';
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { Component,inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule, MatDialogConfig } from '@angular/material/dialog';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { EmployeeDTO } from '../../auth/interfaces/EmployeeDTO';
 import { ToolbarComponent } from '../../shared/toolbar/toolbar.component';
 import { EmployeeEditDialogComponent } from './employee-edit-dialog/employee-edit-dialog.component';
@@ -28,9 +27,7 @@ import { EmployeeCardComponent } from './employee-card/employee-card.component';
   styleUrls: ['./employees.component.css']
 })
 export class EmployeesComponent implements OnInit {
-  private employeesService = inject(EmployeesService);
   private dialog = inject(MatDialog);
-  private destroyRef = inject(DestroyRef);
   private route = inject(ActivatedRoute);
   employees: EmployeeDTO[] = [];
   loading = false;
@@ -50,13 +47,12 @@ export class EmployeesComponent implements OnInit {
     dialogConfig.disableClose = true; // Evita cerrar al hacer clic fuera
     dialogConfig.autoFocus = true;
     dialogConfig.data = { employee };
-    dialogConfig.panelClass = ['blurs-dialog', 'blurs']; // Multiple classes for better targeting
-    dialogConfig.backdropClass = 'dialog-backdrop'; // Custom backdrop class
+    dialogConfig.panelClass = ['blurs-dialog', 'blurs'];
+    dialogConfig.backdropClass = 'dialog-backdrop';
     
     const dialogRef = this.dialog.open(EmployeeEditDialogComponent, dialogConfig);
 
     dialogRef.afterClosed()
-      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(result => {
         if (result) {
           // Update the local employee data if edit was successful
