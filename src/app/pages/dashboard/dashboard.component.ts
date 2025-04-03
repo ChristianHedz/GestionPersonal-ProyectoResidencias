@@ -4,7 +4,7 @@ import { EmployeesService } from './../../service/employees.service';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { Component, DestroyRef, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
@@ -15,32 +15,24 @@ import { MatDividerModule } from '@angular/material/divider';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ToolbarComponent } from '../../shared/toolbar/toolbar.component';
-import 'animate.css';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import Swal from 'sweetalert2';
 import { ZXingScannerModule } from '@zxing/ngx-scanner';
 import { BarcodeFormat } from '@zxing/library';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { toSignal } from '@angular/core/rxjs-interop';
+import Swal from 'sweetalert2';
+import 'animate.css';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   imports: [
-    MatCheckboxModule, 
-    MatToolbarModule, 
-    MatButtonModule, 
-    MatIconModule,
-    MatMenuModule, 
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonToggleModule,
-    MatDividerModule,
-    RouterModule, 
-    CommonModule,
-    ToolbarComponent,
-    ReactiveFormsModule,
+    MatCheckboxModule,     MatToolbarModule, 
+    MatButtonModule,       MatIconModule,
+    MatMenuModule,         MatCardModule,
+    MatFormFieldModule,    MatInputModule,
+    MatButtonToggleModule, MatDividerModule,
+    RouterModule,          CommonModule,
+    ToolbarComponent,      ReactiveFormsModule,
     ZXingScannerModule
   ],
   templateUrl: './dashboard.component.html',
@@ -65,7 +57,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   // Servicios y dependencias
   private timerInterval: any;
   private employeesService = inject(EmployeesService);
-  private destroyRef = inject(DestroyRef);
   private fb = inject(FormBuilder);
   public validatorsService = inject(ValidatorsService);
 
@@ -214,7 +205,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     };
   
     this.employeesService.registerAssist(assistDTO)
-      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.submitting.set(false);

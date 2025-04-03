@@ -5,7 +5,7 @@ import { FormControl, ValidationErrors, FormGroup, AbstractControl } from '@angu
 export class ValidatorsService {
 
   public firstNameAndLastnamePattern: string = '^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ]+([ ][a-zA-ZáéíóúÁÉÍÓÚñÑüÜ]+)+$';
-  public emailPattern: string = "^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$";
+  public emailPattern: string = "^[a-z0-9._%+-]+@[a-z0-9.-]+\\.com$";
   public phonePattern: string = '^[0-9]{10}$';
 
   public isValidField( form: FormGroup, field: string ) {
