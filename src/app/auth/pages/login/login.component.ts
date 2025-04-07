@@ -1,5 +1,5 @@
 import { AuthResponse } from './../../interfaces/authResponse';
-import { Component, computed, inject, OnInit} from '@angular/core';
+import { Component, computed, inject} from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -14,7 +14,8 @@ import Swal from 'sweetalert2';
 import { LoginResponse } from '../../interfaces';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { SocialLoginComponent } from '../social-login/social-login.component';
-import { GoogleSigninButtonModule, SocialLoginModule, SocialAuthService } from '@abacritt/angularx-social-login';
+import { GoogleSigninButtonModule, SocialLoginModule} from '@abacritt/angularx-social-login';
+import { ApiError } from '../../interfaces/apiError';
 
 @Component({
   selector: 'app-login',
@@ -68,7 +69,7 @@ export class LoginComponent{
             employee.role === 'ADMIN' ? this.router.navigateByUrl('/admin/inicio')
              : this.router.navigateByUrl('/admin/info');
           },
-          error: (error: any) => {
+          error: (error: ApiError) => {
             console.error('Error de autenticación:', error);
             Swal.fire('Error', 'Credenciales incorrectas', 'error');
           }

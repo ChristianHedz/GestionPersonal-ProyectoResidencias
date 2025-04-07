@@ -14,6 +14,7 @@ import { AuthResponse } from '../../interfaces/authResponse';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { SocialLoginComponent } from '../social-login/social-login.component';
+import { ApiError } from '../../interfaces/apiError';
 
 
 
@@ -63,9 +64,9 @@ export class RegisterComponent {
             employee.role === 'ADMIN' ? this.router.navigateByUrl('/admin/info')
              : this.router.navigateByUrl('/admin/inicio');
           },
-        error: (error) => {
+        error: (error: ApiError) => {
           this.spinner.hide();
-          Swal.fire(error.error.error, 'No se pudo completar el registro', 'error');
+          Swal.fire(error.error, 'No se pudo completar el registro', 'error');
         }
       });
   }
