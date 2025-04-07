@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component,OnInit, computed, inject, signal } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatNativeDateModule } from '@angular/material/core';
@@ -15,16 +15,15 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { PageEvent } from '@angular/material/paginator';
 import { RouterModule } from '@angular/router';
-
 import { EmployeeAttendanceService } from '../../service/attendance.service';
 import { EmployeesService } from '../../service/employees.service';
 import { AssistDetailsDTO } from '../../interfaces/assist-details.interface';
 import { EmployeeDTO } from '../../auth/interfaces/EmployeeDTO';
 import { ToolbarComponent } from '../../shared/toolbar/toolbar.component';
+import { AttendanceFilterParams, AttendanceType } from '../../interfaces/attendance-filter.interface';
+import { HttpErrorResponse } from '@angular/common/http';
+import { ApiError } from '../../auth/interfaces/apiError';
 
-/**
- * Componente para visualizar y filtrar registros de asistencia de empleados
- */
 @Component({
   selector: 'app-attendance',
   standalone: true,
@@ -50,14 +49,16 @@ import { ToolbarComponent } from '../../shared/toolbar/toolbar.component';
   styleUrls: ['./attendance.component.css']
 })
 export class AttendanceComponent implements OnInit {
+  
   private readonly attendanceService = inject(EmployeeAttendanceService);
   private readonly employeesService = inject(EmployeesService);
+  private readonly fb = inject(FormBuilder);
 
   // Señales para el estado del componente
   private readonly _attendanceData = signal<AssistDetailsDTO[]>([]);
   private readonly _employees = signal<EmployeeDTO[]>([]);
   private readonly _loading = signal<boolean>(false);
-  private readonly _error = signal<string | null>(null);
+  private readonly _error = signal<ApiError | null>(null);
   private readonly _currentPage = signal<number>(0);
   private readonly _pageSize = signal<number>(10);
 
@@ -73,13 +74,23 @@ export class AttendanceComponent implements OnInit {
   readonly totalItems = computed(() => this.attendanceService.totalElements());
 
   // Configuración de columnas para la tabla
-  readonly displayedColumns: string[] = ['id', 'date', 'employeeName', 'entryTime', 'exitTime', 'workedHours', 'incidents', 'actions'];
+  readonly displayedColumns: string[] = [
+    'id', 'date', 'employeeName', 'entryTime', 'exitTime', 'workedHours', 'incidents', 'actions'
+  ];
 
-  // Formulario de filtros
-  filterForm = new FormGroup({
-    employeeId: new FormControl<number | null>(null, [Validators.nullValidator]),
-    date: new FormControl<Date | null>(null, [Validators.nullValidator]),
-    filterType: new FormControl<string>('recent', [Validators.required])
+  // Opciones para tipos de asistencia
+  readonly attendanceTypes = [
+    { value: 'all', label: 'Todos' },
+    { value: 'attendance', label: 'Asistencias' },
+    { value: 'absences', label: 'Faltas' },
+    { value: 'delays', label: 'Retardos' }
+  ];
+
+  filterForm = this.fb.group({
+    attendanceType: this.fb.nonNullable.control<AttendanceType>('all'),
+    employeeFilter: this.fb.nonNullable.control<string>('all'),
+    startDate: this.fb.control<Date | null>(null),
+    endDate: this.fb.control<Date | null>(null)
   });
 
   /**
@@ -87,17 +98,7 @@ export class AttendanceComponent implements OnInit {
    */
   ngOnInit(): void {
     this.loadEmployees();
-    this.loadRecentAttendance();
-    
-    // Suscripción a cambios en el formulario de filtros
-    this.filterForm.get('filterType')?.valueChanges
-      .subscribe(filterType => {
-        if (filterType === 'recent') {
-          this.loadRecentAttendance();
-        } else if (filterType === 'all') {
-          this.loadAllAttendance();
-        }
-      });
+    this.loadAttendance();
   }
 
   /**
@@ -107,45 +108,28 @@ export class AttendanceComponent implements OnInit {
   onPageChange(event: PageEvent): void {
     this._currentPage.set(event.pageIndex);
     this._pageSize.set(event.pageSize);
-    
-    // Recargar datos con la nueva paginación
-    this.reloadCurrentData(event.pageIndex, event.pageSize);
+    // Recargar datos con los nuevos parámetros de paginación
+    this.applyFilters(event.pageIndex, event.pageSize);
   }
 
-  /**
-   * Recarga los datos actuales con parámetros de paginación
-   */
-  private reloadCurrentData(page: number, size: number): void {
-    const { employeeId, date, filterType } = this.filterForm.value;
-    
-    if (employeeId) {
-      this.filterByEmployee(employeeId, page, size);
-    } else if (date) {
-      this.filterByDate(this.formatDate(date), page, size);
-    } else if (filterType === 'recent') {
-      this.loadRecentAttendance(size);
-    } else {
-      this.loadAllAttendance(page, size);
-    }
+  applyFilters(page: number = 0, size: number = this._pageSize()): void {
+    const filters = this.buildFilterParams(page, size);
+    this.loadAttendance(filters);
   }
 
-  /**
-   * Aplica filtros basados en los valores actuales del formulario
-   */
-  applyFilters(): void {
-    const { employeeId, date, filterType } = this.filterForm.value;
-    const page = 0; // Reiniciar a primera página
-    const size = this._pageSize();
-    
-    if (employeeId) {
-      this.filterByEmployee(employeeId, page, size);
-    } else if (date) {
-      this.filterByDate(this.formatDate(date), page, size);
-    } else if (filterType === 'recent') {
-      this.loadRecentAttendance(size);
-    } else {
-      this.loadAllAttendance(page, size);
-    }
+  private buildFilterParams(page: number, size: number): AttendanceFilterParams {
+    const { employeeFilter, startDate, endDate, attendanceType } = this.filterForm.value;
+
+    return {
+      page,
+      size,
+      attendanceType: attendanceType!,
+      employeeId: employeeFilter !== 'all' ? Number(employeeFilter) : undefined,
+      startDate: startDate ? this.formatDate(startDate) : undefined,
+      endDate: endDate ? this.formatDate(endDate) : undefined,
+      sortBy: 'date',
+      sortOrder: 'desc'
+    };
   }
 
   /**
@@ -153,11 +137,16 @@ export class AttendanceComponent implements OnInit {
    */
   resetFilters(): void {
     this.filterForm.reset({
-      employeeId: null,
-      date: null,
-      filterType: 'recent'
+      employeeFilter: 'all',
+      attendanceType: 'all',
+      startDate: null,
+      endDate: null
     });
-    this.loadRecentAttendance();
+    
+    this.loadAttendance({
+      sortBy: 'date',
+      sortOrder: 'desc'
+    });
   }
 
   /**
@@ -167,86 +156,33 @@ export class AttendanceComponent implements OnInit {
     this.employeesService.listAllEmployees()
       .subscribe({
         next: (employees: EmployeeDTO[]) => this._employees.set(employees),
-        error: (err: any) => this._error.set(err)
+        error: (error: ApiError) => this._error.set(error)
       });
   }
 
   /**
-   * Carga todos los registros de asistencia
+   * Carga los registros de asistencia aplicando los filtros especificados
+   * @param filters Filtros a aplicar
    */
-  private loadAllAttendance(page: number = 0, size: number = 20): void {
+  private loadAttendance(filters: AttendanceFilterParams = { sortBy: 'date', sortOrder: 'desc' }): void {
     this._loading.set(true);
-    this.attendanceService.getAllAttendance(page, size)
+    this.attendanceService.getAttendance(filters)
       .subscribe({
         next: (data: AssistDetailsDTO[]) => {
           this._attendanceData.set(data);
-          this._error.set(null);
         },
-        error: (err: any) => {
-          this._error.set(err);
-          this._loading.set(false);
-        },
+        error: (error: ApiError) => this.handleError(error),
         complete: () => this._loading.set(false)
       });
   }
 
   /**
-   * Carga los registros de asistencia más recientes
+   * Manejo centralizado de errores
+   * @param err Error recibido
    */
-  private loadRecentAttendance(size: number = 20): void {
-    this._loading.set(true);
-    this.attendanceService.getRecentAttendance(size)
-      .subscribe({
-        next: (data: AssistDetailsDTO[]) => {
-          this._attendanceData.set(data);
-          this._error.set(null);
-        },
-        error: (err: any) => {
-          this._error.set(err);
-          this._loading.set(false);
-        },
-        complete: () => this._loading.set(false)
-      });
-  }
-
-  /**
-   * Filtra asistencias por ID de empleado
-   * @param employeeId ID del empleado
-   */
-  private filterByEmployee(employeeId: number, page: number = 0, size: number = 20): void {
-    this._loading.set(true);
-    this.attendanceService.getAttendanceByEmployee(employeeId, page, size)
-      .subscribe({
-        next: (data: AssistDetailsDTO[]) => {
-          this._attendanceData.set(data);
-          this._error.set(null);
-        },
-        error: (err: any) => {
-          this._error.set(err);
-          this._loading.set(false);
-        },
-        complete: () => this._loading.set(false)
-      });
-  }
-
-  /**
-   * Filtra asistencias por fecha
-   * @param date Cadena de fecha en formato YYYY-MM-DD
-   */
-  private filterByDate(date: string, page: number = 0, size: number = 20): void {
-    this._loading.set(true);
-    this.attendanceService.getAttendanceByDate(date, page, size)
-      .subscribe({
-        next: (data: AssistDetailsDTO[]) => {
-          this._attendanceData.set(data);
-          this._error.set(null);
-        },
-        error: (err: any) => {
-          this._error.set(err);
-          this._loading.set(false);
-        },
-        complete: () => this._loading.set(false)
-      });
+  private handleError(error: ApiError): void {
+    this._error.set(error);
+    this._loading.set(false);
   }
 
   /**
