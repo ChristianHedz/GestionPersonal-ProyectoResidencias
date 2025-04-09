@@ -1,0 +1,30 @@
+<h2 mat-dialog-title>Registro de retardo</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="lateForm" class="late-form">
+    <p class="mb-3">Has llegado después de las 9:10 AM. Por favor, indícanos el motivo de tu retardo.</p>
+    
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Descripción</mat-label>
+      <textarea 
+        matInput 
+        formControlName="reason" 
+        rows="4"
+        placeholder="Describe brevemente el motivo de tu retardo"></textarea>
+        <mat-error *ngIf="validatorsService.isValidField(lateForm, 'reason')">
+          {{ validatorsService.getFieldError(lateForm, 'reason') }}
+        </mat-error>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancelar</button>
+  <button 
+    mat-raised-button 
+    color="primary" 
+    [disabled]="lateForm.invalid" 
+    (click)="onSubmit()">
+    Registrar asistencia
+  </button>
+</mat-dialog-actions>

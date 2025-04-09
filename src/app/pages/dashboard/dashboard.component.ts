@@ -4,7 +4,7 @@ import { EmployeesService } from './../../service/employees.service';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
@@ -21,6 +21,8 @@ import { BarcodeFormat } from '@zxing/library';
 import { toSignal } from '@angular/core/rxjs-interop';
 import Swal from 'sweetalert2';
 import 'animate.css';
+import { MatDialogModule, MatDialog } from '@angular/material/dialog';
+import { LateDialogComponent } from '../../components/late-dialog/late-dialog.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -33,7 +35,7 @@ import 'animate.css';
     MatButtonToggleModule, MatDividerModule,
     RouterModule,          CommonModule,
     ToolbarComponent,      ReactiveFormsModule,
-    ZXingScannerModule
+    ZXingScannerModule,    MatDialogModule
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
@@ -59,14 +61,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private employeesService = inject(EmployeesService);
   private fb = inject(FormBuilder);
   public validatorsService = inject(ValidatorsService);
+  private dialog = inject(MatDialog);
 
   // Formulario de asistencia
   readonly assistForm = this.fb.group({
     email: ['', [Validators.required, Validators.pattern(this.validatorsService.emailPattern)]],
   });
 
-  // Proyección del email como señal
-  email = toSignal(this.assistForm.controls.email.valueChanges, { initialValue: '' });
+  email = computed(() => this.assistForm.controls.email);
 
   /**
    * Inicializa el componente y configura el temporizador para actualizar la hora
@@ -194,16 +196,56 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.submitting.set(true);
     
     const now = new Date();
+    const entryTime = now.toLocaleTimeString('es-MX', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    });
+    
     const assistDTO: AssistDTO = {
       date: now.toLocaleDateString('en-CA'), 
-      entryTime: now.toLocaleTimeString('es-MX', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false
-      }),
-      emailEmployee: email
+      entryTime,
+      emailEmployee: email,
+      incident: 'NA',
     };
-  
+
+    // Convertir la hora actual a un objeto Date para comparación
+    const currentTime = new Date();
+    currentTime.setHours(parseInt(entryTime.split(':')[0], 10));
+    currentTime.setMinutes(parseInt(entryTime.split(':')[1], 10));
+    
+    // Crear referencia a la hora límite (9:10 AM)
+    const lateTime = new Date();
+    lateTime.setHours(9);
+    lateTime.setMinutes(10);
+    
+    // Verificar si el empleado llegó tarde
+    if (currentTime > lateTime) {
+      // Mostrar el modal para registrar la tardanza  
+      this.dialog.open(LateDialogComponent, {
+        width: '500px',
+        disableClose: true,
+      }).afterClosed().subscribe((result: { incident: string; reason: string } | undefined) => {
+        if (result) {
+          // Si se completó el formulario, agregar datos de incidencia
+          assistDTO.incident = result.incident;
+          assistDTO.reason = result.reason;
+          this.submitAttendance(assistDTO);
+        } else {
+          // Si se canceló el diálogo
+          this.submitting.set(false);
+        }
+      });
+    } else {
+      // No llegó tarde, registrar asistencia normal
+      this.submitAttendance(assistDTO);
+    }
+  }
+
+  /**
+   * Envía los datos de asistencia al servicio
+   */
+  private submitAttendance(assistDTO: AssistDTO): void {
     this.employeesService.registerAssist(assistDTO)
       .subscribe({
         next: () => {
@@ -214,7 +256,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           if (isQrMode) {
             Swal.fire({
               title: '¡Asistencia registrada!',
-              text: `Se ha registrado la asistencia para ${email}`,
+              text: `Se ha registrado la asistencia para ${assistDTO.emailEmployee}`,
               icon: 'success',
               timer: 3000,
               timerProgressBar: true
