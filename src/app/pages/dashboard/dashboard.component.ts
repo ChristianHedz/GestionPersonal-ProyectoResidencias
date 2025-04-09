@@ -206,7 +206,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       date: now.toLocaleDateString('en-CA'), 
       entryTime,
       emailEmployee: email,
-      incident: 'NA',
+      incidents: 'NA',
     };
 
     // Convertir la hora actual a un objeto Date para comparación
@@ -228,7 +228,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       }).afterClosed().subscribe((result: { incident: string; reason: string } | undefined) => {
         if (result) {
           // Si se completó el formulario, agregar datos de incidencia
-          assistDTO.incident = result.incident;
+          assistDTO.incidents = result.incident;
           assistDTO.reason = result.reason;
           this.submitAttendance(assistDTO);
         } else {

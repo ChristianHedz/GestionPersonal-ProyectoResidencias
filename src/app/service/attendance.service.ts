@@ -6,10 +6,12 @@ import { AssistDetailsDTO } from '../interfaces/assist-details.interface';
 import { PageResponse } from '../interfaces/pagination.interface';
 import { ErrorHandlerService } from './error-handler.service';
 import { environment } from '../../env/enviroments';
-import { API_ENDPOINTS } from '../config/api.endpoints';
 import { AttendanceFilterParams, SortOrder } from '../interfaces/attendance-filter.interface';
 import { Attendance } from '../interfaces/Attendance.interface';
 
+const API_ENDPOINTS = {
+  GET_ATTENDANCE: '/assist-details',
+};
 
 @Injectable({
   providedIn: 'root'
@@ -40,8 +42,8 @@ export class EmployeeAttendanceService {
     this._loading.set(true);
 
     const params = this.buildHttpParams(filters);
-    const endpoint = API_ENDPOINTS.ATTENDANCE.FILTERED;
-
+    console.log('Fetching attendance with params:', params);
+    const endpoint = API_ENDPOINTS.GET_ATTENDANCE;
     return this.http.get<PageResponse<Attendance>>(`${this.apiUrl}${endpoint}`, { params })
       .pipe(
         map(response => {
@@ -66,7 +68,7 @@ export class EmployeeAttendanceService {
       page = EmployeeAttendanceService.DEFAULT_PAGE,
       size = EmployeeAttendanceService.DEFAULT_SIZE,
       employeeId,
-      attendanceType,
+      attendanceIncidents,
       startDate,
       endDate,
       sortBy = EmployeeAttendanceService.DEFAULT_SORT_BY,
@@ -83,8 +85,8 @@ export class EmployeeAttendanceService {
       params = params.set('employeeId', employeeId.toString());
     }
 
-    if (attendanceType && attendanceType !== 'all') {
-      params = params.set('type', attendanceType);
+    if (attendanceIncidents && attendanceIncidents !== 'all') {
+      params = params.set('incidents', attendanceIncidents);
     }
 
     if (startDate && endDate) {

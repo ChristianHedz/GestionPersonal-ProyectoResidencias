@@ -20,8 +20,7 @@ import { EmployeesService } from '../../service/employees.service';
 import { AssistDetailsDTO } from '../../interfaces/assist-details.interface';
 import { EmployeeDTO } from '../../auth/interfaces/EmployeeDTO';
 import { ToolbarComponent } from '../../shared/toolbar/toolbar.component';
-import { AttendanceFilterParams, AttendanceType } from '../../interfaces/attendance-filter.interface';
-import { HttpErrorResponse } from '@angular/common/http';
+import { AttendanceFilterParams, AttendanceIncidents } from '../../interfaces/attendance-filter.interface';
 import { ApiError } from '../../auth/interfaces/apiError';
 
 @Component({
@@ -75,19 +74,19 @@ export class AttendanceComponent implements OnInit {
 
   // Configuración de columnas para la tabla
   readonly displayedColumns: string[] = [
-    'id', 'date', 'employeeName', 'entryTime', 'exitTime', 'workedHours', 'incidents', 'actions'
+    'id', 'date', 'employeeName', 'entryTime', 'exitTime', 'workedHours', 'incidents', 'reason'
   ];
 
   // Opciones para tipos de asistencia
-  readonly attendanceTypes = [
+  readonly attendanceIncidents = [
     { value: 'all', label: 'Todos' },
-    { value: 'attendance', label: 'Asistencias' },
-    { value: 'absences', label: 'Faltas' },
-    { value: 'delays', label: 'Retardos' }
+    { value: 'ASISTENCIA', label: 'Asistencias' },
+    { value: 'FALTA', label: 'Faltas' },
+    { value: 'RETARDO', label: 'Retardos' }
   ];
 
   filterForm = this.fb.group({
-    attendanceType: this.fb.nonNullable.control<AttendanceType>('all'),
+    attendanceIncidents: this.fb.nonNullable.control<AttendanceIncidents>('all'),
     employeeFilter: this.fb.nonNullable.control<string>('all'),
     startDate: this.fb.control<Date | null>(null),
     endDate: this.fb.control<Date | null>(null)
@@ -114,16 +113,17 @@ export class AttendanceComponent implements OnInit {
 
   applyFilters(page: number = 0, size: number = this._pageSize()): void {
     const filters = this.buildFilterParams(page, size);
+    console.log('Applying filters:', filters);
     this.loadAttendance(filters);
   }
 
   private buildFilterParams(page: number, size: number): AttendanceFilterParams {
-    const { employeeFilter, startDate, endDate, attendanceType } = this.filterForm.value;
+    const { employeeFilter, startDate, endDate, attendanceIncidents } = this.filterForm.value;
 
     return {
       page,
       size,
-      attendanceType: attendanceType!,
+      attendanceIncidents: attendanceIncidents!,
       employeeId: employeeFilter !== 'all' ? Number(employeeFilter) : undefined,
       startDate: startDate ? this.formatDate(startDate) : undefined,
       endDate: endDate ? this.formatDate(endDate) : undefined,
@@ -138,7 +138,7 @@ export class AttendanceComponent implements OnInit {
   resetFilters(): void {
     this.filterForm.reset({
       employeeFilter: 'all',
-      attendanceType: 'all',
+      attendanceIncidents: 'all',
       startDate: null,
       endDate: null
     });

@@ -4,6 +4,7 @@ export interface Attendance {
     entryTime: string;
     exitTime: string;
     incidents: string;
+    reason: string;
     workedHours: number;
     fullName: string;
 }

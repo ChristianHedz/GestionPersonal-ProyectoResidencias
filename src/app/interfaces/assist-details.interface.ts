@@ -7,6 +7,7 @@ export interface AssistDetailsDTO {
   entryTime: string; // Format HH:MM:SS
   exitTime: string; // Format HH:MM:SS
   incidents: string;
+  reason: string;
   workedHours: number;
   fullName: string;
 }
