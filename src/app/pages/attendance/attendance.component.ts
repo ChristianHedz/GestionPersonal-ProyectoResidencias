@@ -22,6 +22,8 @@ import { EmployeeDTO } from '../../auth/interfaces/EmployeeDTO';
 import { ToolbarComponent } from '../../shared/toolbar/toolbar.component';
 import { AttendanceFilterParams, AttendanceIncidents } from '../../interfaces/attendance-filter.interface';
 import { ApiError } from '../../auth/interfaces/apiError';
+import { finalize } from 'rxjs';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-attendance',
@@ -195,5 +197,79 @@ export class AttendanceComponent implements OnInit {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
+  }
+
+  /**
+   * Exporta los datos de asistencia a Excel utilizando los filtros actuales
+   * Implementa un enfoque declarativo y reactivo para manejar la solicitud
+   */
+  exportToExcel(): void {
+    // Construir parámetros de solicitud
+    const filters = this.buildExcelExportParams();
+    // Generar nombre de archivo con la fecha actual
+    const filename = `asistencias_${this.formatDate(new Date())}.xlsx`;
+    
+    // Flujo reactivo para gestionar la exportación
+    this.attendanceService.exportToExcel(filters).pipe(
+      finalize(() => this._loading.set(false))
+    ).subscribe({
+      next: (blob: Blob) => this.downloadExcelFile(blob, filename),
+      error: (error: ApiError) => this.handleError(error)
+    });
+  }
+
+  /**
+   * Construye los parámetros para la exportación a Excel
+   * @returns Parámetros de filtrado sin paginación
+   */
+  private buildExcelExportParams(): AttendanceFilterParams {
+    // Obtener filtros actuales sin paginación
+    return {
+      ...this.buildFilterParams(this._currentPage(), this._pageSize()),
+      page: undefined,
+      size: undefined
+    };
+  }
+  
+  /**
+   * Gestiona la descarga de un archivo de Excel de manera segura
+   * @param blob Contenido del archivo como Blob
+   * @param filename Nombre del archivo para la descarga
+   */
+  private downloadExcelFile(blob: Blob, filename: string): void {
+    try {
+      // Preparar el blob con el tipo MIME correcto
+      const excelBlob = new Blob([blob], { 
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+      });
+      // Crear URL y descargar
+      const blobUrl = URL.createObjectURL(excelBlob);
+      this.triggerBrowserDownload(blobUrl, filename);
+    } catch (error) {
+      Swal.fire('Error al descargar el archivo Excel', error instanceof Error ? error.message : 'Error desconocido', 'error');
+    }
+  }
+  
+  /**
+   * Desencadena la descarga del archivo en el navegador
+   * @param blobUrl URL del blob
+   * @param filename Nombre del archivo
+   */
+  private triggerBrowserDownload(blobUrl: string, filename: string): void {
+    // Crear un elemento <a> temporal para la descarga
+    const downloadLink = document.createElement('a');
+    downloadLink.style.display = 'none';
+    downloadLink.href = blobUrl;
+    downloadLink.download = filename;
+    
+    // Configurar limpieza automática
+    downloadLink.addEventListener('click', () => {
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 150);
+    }, { once: true });
+    
+    // Ejecutar descarga
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
   }
 }

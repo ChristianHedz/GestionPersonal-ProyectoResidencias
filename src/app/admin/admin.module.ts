@@ -5,6 +5,7 @@ import { DashboardComponent } from '../pages/dashboard/dashboard.component';
 import { InfoComponent } from '../pages/info/info.component';
 import { EmployeesComponent } from '../pages/employees/employees.component';
 import { AttendanceComponent } from '../pages/attendance/attendance.component';
+import { EmployeesResolver } from '../core/resolvers/employees.resolver';
 
 
 const routes: Routes = [
@@ -22,9 +23,9 @@ const routes: Routes = [
     path: 'empleados',
     component: EmployeesComponent,
     // canMatch: [isAdminGuard]
-    // resolve: {
-    //   employees: EmployeesResolver
-    // }
+    resolve: {
+      employees: EmployeesResolver
+    }
   },
   {
     path: 'asistencias',

@@ -11,6 +11,7 @@ import { Attendance } from '../interfaces/Attendance.interface';
 
 const API_ENDPOINTS = {
   GET_ATTENDANCE: '/assist-details',
+  EXPORT_EXCEL: '/assist-details/excel',
 };
 
 @Injectable({
@@ -113,5 +114,30 @@ export class EmployeeAttendanceService {
       ...record,
       date: record.date
     }));
+  }
+
+  /**
+   * Exporta los registros de asistencia a Excel basados en los filtros aplicados
+   * @param filters Objeto con los parámetros de filtrado
+   * @returns Observable con el archivo de Excel como Blob
+   */
+  exportToExcel(filters: AttendanceFilterParams = {}): Observable<Blob> {
+    this._loading.set(true);
+    
+    const params = this.buildHttpParams(filters);
+    const endpoint = API_ENDPOINTS.EXPORT_EXCEL;
+    
+    return this.http.get(`${this.apiUrl}${endpoint}`, { 
+      params, 
+      responseType: 'blob',
+      headers: { 'Accept': 'application/vnd.ms-excel' }
+    }).pipe(
+      tap(()=> console.log('Exporting Excel', filters)),
+      tap(() => this._loading.set(false)),
+      catchError(error => {
+        this._loading.set(false);
+        return throwError(() => this.errorHandler(error));
+      })
+    );
   }
 }

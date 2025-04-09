@@ -48,10 +48,7 @@ export class EmployeeEditDialogComponent implements OnInit {
   });
   
   ngOnInit(): void {
-    // Debug para ver la estructura del diálogo
-    console.log('Dialog container:', document.querySelector('.mat-mdc-dialog-container'));
-    console.log('Dialog surface:', document.querySelector('.mdc-dialog__surface'));
-    
+
     // Initialize form with employee data
     if (this.data && this.data.employee) {
       this.employeeForm.patchValue({
