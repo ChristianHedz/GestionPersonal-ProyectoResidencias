@@ -1,0 +1,30 @@
+.chart-card {
+  margin: 16px;
+  padding: 16px;
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  background-color: rgba(17, 25, 40, 0.25);
+  border-radius: 12px;
+}
+
+.controls-container {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.control-group {
+  margin: 8px;
+}
+
+.chart-container {
+  height: 400px;
+  position: relative;
+}
+
+@media (max-width: 768px) {
+  .controls-container {
+    flex-direction: column;
+  }
+}

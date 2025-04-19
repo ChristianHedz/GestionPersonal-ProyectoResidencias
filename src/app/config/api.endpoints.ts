@@ -25,10 +25,5 @@ export const API_ENDPOINTS = {
   // Endpoints de asistencia de empleados
   ATTENDANCE: {
     GET_ALL: '/assist-details',
-    GET_BY_EMPLOYEE: '/assist-details/employee', // + employeeId
-    GET_BY_DATE: '/assist-details/date', // + date (YYYY-MM-DD)
-    GET_RECENT: '/assist-details',
-    REGISTER_ENTRY: '/assist-details/entry', // + employeeId
-    REGISTER_EXIT: '/assist-details/exit', // + employeeId
   }
 };
