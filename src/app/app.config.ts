@@ -10,9 +10,11 @@ import { AuthInterceptor } from './auth/interceptors/auth.interceptor';
 import { CoreModule } from './core/core.module';
 import { NavigationService } from './core/services/navigation.service';
 import { FacebookLoginProvider, GoogleLoginProvider, SocialAuthServiceConfig } from '@abacritt/angularx-social-login';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideCharts(withDefaultRegisterables()),
     importProvidersFrom(CoreModule),
     provideZoneChangeDetection({ eventCoalescing: true }), 
     provideRouter(routes), 
