@@ -24,6 +24,7 @@ import { AttendanceFilterParams, AttendanceIncidents } from '../../interfaces/at
 import { ApiError } from '../../auth/interfaces/apiError';
 import { finalize } from 'rxjs';
 import Swal from 'sweetalert2';
+import { ChatbotBubbleComponent } from '../../components/chatbot-bubble/chatbot-bubble.component';
 
 @Component({
   selector: 'app-attendance',
@@ -44,7 +45,8 @@ import Swal from 'sweetalert2';
     MatTooltipModule,
     MatProgressSpinnerModule,
     MatPaginatorModule,
-    ToolbarComponent
+    ToolbarComponent,
+    ChatbotBubbleComponent
   ],
   templateUrl: './attendance.component.html',
   styleUrls: ['./attendance.component.css']

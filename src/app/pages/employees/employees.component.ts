@@ -10,6 +10,7 @@ import { ToolbarComponent } from '../../shared/toolbar/toolbar.component';
 import { EmployeeEditDialogComponent } from './employee-edit-dialog/employee-edit-dialog.component';
 import { ActivatedRoute } from '@angular/router';
 import { EmployeeCardComponent } from './employee-card/employee-card.component';
+import { ChatbotBubbleComponent } from '../../components/chatbot-bubble/chatbot-bubble.component';
 
 @Component({
   selector: 'app-employees',
@@ -21,7 +22,8 @@ import { EmployeeCardComponent } from './employee-card/employee-card.component';
     MatIconModule,
     MatDialogModule,
     ToolbarComponent,
-    EmployeeCardComponent
+    EmployeeCardComponent,
+    ChatbotBubbleComponent
   ],
   templateUrl: './employees.component.html',
   styleUrls: ['./employees.component.css']

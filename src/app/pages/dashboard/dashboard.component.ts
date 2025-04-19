@@ -23,29 +23,41 @@ import Swal from 'sweetalert2';
 import 'animate.css';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { LateDialogComponent } from '../../components/late-dialog/late-dialog.component';
+import { ChatbotBubbleComponent } from '../../components/chatbot-bubble/chatbot-bubble.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   imports: [
-    MatCheckboxModule,     MatToolbarModule, 
-    MatButtonModule,       MatIconModule,
-    MatMenuModule,         MatCardModule,
-    MatFormFieldModule,    MatInputModule,
-    MatButtonToggleModule, MatDividerModule,
-    RouterModule,          CommonModule,
-    ToolbarComponent,      ReactiveFormsModule,
-    ZXingScannerModule,    MatDialogModule
+    CommonModule,
+    RouterModule,
+    ReactiveFormsModule,
+    ZXingScannerModule,
+    // Angular Material
+    MatButtonModule,
+    MatButtonToggleModule,
+    MatCardModule,
+    MatCheckboxModule,
+    MatDialogModule,
+    MatDividerModule,
+    MatFormFieldModule,
+    MatIconModule,
+    MatInputModule,
+    MatMenuModule,
+    MatToolbarModule,
+    // Componentes propios
+    ToolbarComponent,
+    ChatbotBubbleComponent
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
 })
 export class DashboardComponent implements OnInit, OnDestroy {
-  // Propiedades de tiempo y estado
-  currentTime = signal<string>('');
-  currentDate = signal<string>('');
-  currentView = signal<'boton' | 'codigo'>('boton');
-  submitting = signal<boolean>(false);
+  // Señales para tiempo y estado
+  readonly currentTime = signal<string>('');
+  readonly currentDate = signal<string>('');
+  readonly currentView = signal<'boton' | 'codigo'>('boton');
+  readonly submitting = signal<boolean>(false);
   
   // Propiedades del escáner QR
   scannerEnabled = signal<boolean>(false);
@@ -197,9 +209,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     
     const now = new Date();
     const entryTime = now.toLocaleTimeString('es-MX', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
     });
     
     const assistDTO: AssistDTO = {

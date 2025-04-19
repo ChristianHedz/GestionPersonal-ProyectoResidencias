@@ -13,19 +13,19 @@
     </div>
 
     <div class="container mx-auto p-3" *ngIf="currentView() === 'boton'">
-      <div class="grid justify-content-center">
+      <div class="grid justify-content-center ">
         <!-- Centered Time and Registration - only one column now -->
         <div class="col-12 sm:col-10 md:col-8 lg:col-6 p-3">
           <div class="blur p-4 sm:p-3 md:p-4 lg:p-4">
             <div class="flex flex-column align-items-center">
               <!-- Time Display -->
-              <div class="time-display text-center mb-4">
-                <h1 class="text-5xl font-light mb-2 text-5xl sm:text-5xl">{{ currentTime() }}</h1>
+              <div class="time-display text-center mb-4 animate__animated animate__fadeInUp">
+                <h1 class="text-5xl font-light mb-2 sm:text-6xl">{{ currentTime() }}</h1>
                 <h3 class="font-light text-600 m-0 text-base sm:text-base">{{ currentDate() }}</h3>
               </div>
               
               <!-- Email Input -->
-              <form class="w-full sm:w-10 md:w-10 mb-4" [formGroup]="assistForm">
+              <form class="w-full sm:w-10 md:w-10 mb-4 " [formGroup]="assistForm">
                 <mat-form-field appearance="outline" class="w-full">
                   <mat-label>Introduce tu correo</mat-label>
                   <input matInput type="email" formControlName="email" >
@@ -109,4 +109,5 @@
       </div>
     </div>
   </div>
+  <app-chatbot-bubble></app-chatbot-bubble>
 </div>
