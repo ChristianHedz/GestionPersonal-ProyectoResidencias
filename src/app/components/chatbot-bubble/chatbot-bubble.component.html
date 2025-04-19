@@ -1,0 +1,142 @@
+<!-- Contenedor principal que contiene tanto la burbuja como el chatbot expandido -->
+<div class="chatbot-container">
+  
+  <!-- Burbuja flotante del chatbot - visible cuando está cerrado -->
+  <button 
+    mat-fab 
+    color="primary" 
+    class="chat-bubble shadow-8 animate__animated animate__pulse" 
+    [class.hidden]="isOpen()" 
+    (click)="toggleChat()" 
+    aria-label="Abrir chat"
+    matTooltip="Asistente Virtual">
+    <mat-icon>smart_toy</mat-icon>
+  </button>
+  
+  <!-- Ventana de chat - visible cuando está abierta -->
+  <div 
+    class="chat-window surface-card border-round-xl shadow-8" 
+    [class.visible]="isOpen()" 
+    [class.hidden]="!isOpen()">
+    
+    <!-- Encabezado del chat -->
+    <div class="chat-header p-3 bg-primary flex align-items-center justify-content-between border-round-top-xl">
+      <div class="flex align-items-center">
+        <mat-icon class="text-white mr-2">support_agent</mat-icon>
+        <span class="text-white font-medium">Asistente Virtual</span>
+      </div>
+      <button mat-icon-button (click)="toggleChat()" aria-label="Cerrar chat" class="p-button-rounded p-button-text">
+        <mat-icon class="text-white">close</mat-icon>
+      </button>
+    </div>
+    
+    <!-- Contenido del chat -->
+    <div class="chat-content p-3 overflow-auto">
+      <!-- Mensajes dinámicos -->
+      <div class="chat-messages flex flex-column">
+        @for (message of messages(); track message.timestamp) {
+          <div 
+            [class]="message.role === 'assistant' ? 'bot-message p-2 mb-2 border-round-lg shadow-2' : 'user-message p-2 mb-2 border-round-lg shadow-2'"
+            [attr.aria-label]="message.role === 'assistant' ? 'Mensaje del asistente' : 'Tu mensaje'">
+            {{ message.content }}
+          </div>
+        }
+        
+        <!-- Indicador de carga cuando está procesando -->
+        @if (isLoading()) {
+          <div class="bot-message p-2 mb-2 border-round-lg shadow-2 typing-indicator">
+            <div class="typing-dots">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+    
+    <!-- Indicador de grabación de audio -->
+    @if (isRecording()) {
+      <div class="recording-indicator flex align-items-center p-2 gap-2">
+        <div class="recording-animation"></div>
+        <span class="text-primary font-medium">Grabando {{ formatRecordingTime(recordingTime()) }}</span>
+        <div class="flex-grow-1"></div>
+        <button 
+          mat-mini-fab 
+          color="warn" 
+          class="shadow-4"
+          (click)="stopRecording()"
+          matTooltip="Detener grabación">
+          <mat-icon>stop</mat-icon>
+        </button>
+      </div>
+    }
+    
+    <!-- Pie del chat con entrada de texto -->
+    <div class="chat-footer p-3 flex align-items-center border-round-bottom-xl">
+      <!-- Elemento de audio oculto para reproducir respuestas -->
+      <audio #audioElement class="hidden"></audio>
+      
+      <!-- Modo de entrada (texto o audio) -->
+      @if (!audioMode() || isRecording()) {
+        <!-- Modo texto -->
+        <div class="w-full flex gap-2">
+          <mat-form-field class="flex-grow-1 w-full">
+            <input 
+              #inputMessage
+              matInput 
+              [(ngModel)]="currentMessage"
+              placeholder="Escribe tu mensaje..." 
+              (keyup.enter)="sendMessage()"
+              [disabled]="isLoading()">
+          </mat-form-field>
+          
+          <button 
+            mat-mini-fab 
+            color="primary" 
+            class="shadow-4 align-self-center" 
+            type="button"
+            [disabled]="!canSendMessage()"
+            (click)="sendMessage()"
+            matTooltip="Enviar mensaje">
+            <mat-icon>send</mat-icon>
+          </button>
+          
+          <button 
+            mat-mini-fab 
+            color="accent" 
+            class="shadow-4 align-self-center" 
+            type="button"
+            [disabled]="isLoading()"
+            (click)="toggleAudioMode()"
+            matTooltip="Cambiar a entrada por voz">
+            <mat-icon>mic</mat-icon>
+          </button>
+        </div>
+      } @else {
+        <!-- Modo audio -->
+        <div class="w-full flex gap-2 justify-content-center">
+          <button 
+            mat-fab 
+            color="accent" 
+            class="shadow-4" 
+            [disabled]="isLoading()"
+            (click)="startRecording()"
+            matTooltip="Iniciar grabación">
+            <mat-icon>mic</mat-icon>
+          </button>
+          
+          <button 
+            mat-mini-fab 
+            class="shadow-4 align-self-center" 
+            type="button"
+            [disabled]="isLoading()"
+            (click)="toggleAudioMode()"
+            matTooltip="Cambiar a entrada por texto">
+            <mat-icon>keyboard</mat-icon>
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+</div>

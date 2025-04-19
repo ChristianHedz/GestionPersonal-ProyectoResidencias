@@ -1,0 +1,207 @@
+/* Estilos esenciales que no se pueden reemplazar con PrimeFlex */
+.chatbot-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+/* Estilos para la burbuja flotante */
+.chat-bubble {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  transition: all 0.3s ease;
+}
+
+.chat-bubble:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+}
+
+/* Ventana del chat */
+.chat-window {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  width: 320px;
+  height: 450px;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px);
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--surface-border, rgba(255, 255, 255, 0.3));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.chat-window.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.chat-header {
+  background: var(--primary-color);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.chat-content {
+  flex: 1;
+  height: calc(100% - 130px);
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+.chat-footer {
+  border-top: 1px solid var(--surface-border, #dee2e6);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+/* Estilos para los mensajes */
+.bot-message {
+  background: rgba(233, 216, 253, 0.8);
+  border-radius: 18px 18px 18px 4px;
+  padding: 10px 16px;
+  margin-bottom: 10px;
+  max-width: 80%;
+  align-self: flex-start;
+  color: var(--text-color, #333);
+  border-left: 3px solid #8b5cf6;
+  transition: all 0.3s ease;
+  animation: fadeIn 0.3s ease;
+}
+
+.user-message {
+  background: rgba(210, 235, 231, 0.8);
+  border-radius: 18px 18px 4px 18px;
+  padding: 10px 16px;
+  margin-bottom: 10px;
+  max-width: 80%;
+  align-self: flex-end;
+  margin-left: auto;
+  color: var(--text-color, #333);
+  border-right: 3px solid #0ea5e9;
+  transition: all 0.3s ease;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Clase de utilidad */
+.hidden {
+  display: none !important;
+}
+
+/* Personalización de la barra de desplazamiento */
+.chat-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.chat-content::-webkit-scrollbar-track {
+  background: rgba(240, 240, 240, 0.5);
+  border-radius: 10px;
+}
+
+.chat-content::-webkit-scrollbar-thumb {
+  background: var(--primary-color, #6366f1);
+  border-radius: 10px;
+}
+
+.chat-content::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-color-darker, #4f46e5);
+}
+
+/* Indicador de grabación de audio */
+.recording-indicator {
+  background-color: rgba(255, 240, 240, 0.9);
+  border-top: 1px solid rgba(244, 67, 54, 0.3);
+  padding: 8px 16px;
+}
+
+.recording-animation {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #f44336;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+}
+
+/* Indicador de escritura (tres puntos) */
+.typing-indicator {
+  padding: 8px 16px !important;
+  min-width: 50px !important;
+  max-width: 60px !important;
+}
+
+.typing-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 20px;
+}
+
+.typing-dots span {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--primary-color, #6366f1);
+  margin: 0 2px;
+  animation: dotTyping 1.5s infinite;
+}
+
+.typing-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes dotTyping {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.6);
+    opacity: 0.3;
+  }
+}
