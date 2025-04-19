@@ -1,0 +1,219 @@
+<!-- Fondo con gradiente -->
+<app-toolbar></app-toolbar>
+
+<div class="gradient-background">
+  <!-- Contenedor principal con espaciado responsive usando PrimeFlex -->
+  <div class="grid mt-3 p-fluid">
+    <div class="col-12">
+      <div class="flex align-items-center mb-4">
+        <h1 class="text-3xl font-bold text-white my-0 mx-3 align-items-center">
+          <mat-icon class="mr-2 text-white">smart_toy</mat-icon>
+          Configuración de Chatbot
+        </h1>
+        <button mat-mini-fab color="primary" class="ml-auto" matTooltip="Refrescar" (click)="loadDocuments()">
+          <mat-icon>refresh</mat-icon>
+        </button>
+      </div>
+      
+      <!-- Card para subir documentos -->
+      <div class="grid">
+        <div class="col-12 md:col-5 lg:col-4">
+          <mat-card class="h-full glassmorphism-card">
+            <mat-card-header>
+              <mat-card-title class="text-xl">Subir documento</mat-card-title>
+              <mat-card-subtitle>Añade documentos para el entrenamiento del chatbot</mat-card-subtitle>
+            </mat-card-header>
+            
+            <mat-card-content>
+              <form [formGroup]="uploadForm" class="mt-3">
+                <!-- Área de arrastrar y soltar para el archivo -->
+                <div 
+                  class="border-dashed glassmorphism-dropzone"
+                  [class.dragging]="isDragging()"
+                  [class.border-primary]="selectedFile"
+                  (dragover)="onDragOver($event)" 
+                  (dragleave)="onDragLeave($event)" 
+                  (drop)="onDrop($event)"
+                  (click)="fileInput.click()"
+                >
+                  @if (!selectedFile) {
+                    <div class="flex flex-column align-items-center justify-content-center">
+                      <mat-icon class="text-6xl text-white">cloud_upload</mat-icon>
+                      <h3 class="text-xl font-medium text-white mb-2 mt-3">Arrastra archivos aquí</h3>
+                      <span class="text-white text-opacity-80 mb-2">o haz clic para seleccionar</span>
+                      <span class="text-white text-opacity-70 text-sm">(PDF, DOC, DOCX, TXT, CSV)</span>
+                    </div>
+                  } @else {
+                    <div class="flex flex-column align-items-center justify-content-center p-3">
+                      <mat-icon class="text-4xl text-primary mb-2">description</mat-icon>
+                      <h3 class="font-medium mb-1 text-overflow-ellipsis overflow-hidden text-white" style="max-width: 100%;">
+                        {{ selectedFile.name }}
+                      </h3>
+                      <span class="text-sm text-white text-opacity-80">{{ formatFileSize(selectedFile.size) }}</span>
+                      <button mat-raised-button color="warn" class="mt-3" (click)="resetForm(); $event.stopPropagation()">
+                        <mat-icon class="text-sm">delete</mat-icon>
+                        <span class="ml-1">Remover</span>
+                      </button>
+                    </div>
+                  }
+                </div>
+                
+                <input 
+                  #fileInput 
+                  type="file" 
+                  hidden 
+                  accept=".pdf,.doc,.docx,.txt,.csv"
+                  (change)="onFileSelected($event)"
+                >
+                
+                <!-- Campo de descripción -->
+                <mat-form-field appearance="outline" class="w-full mt-4 mb-2">
+                  <mat-label>Descripción (opcional)</mat-label>
+                  <textarea 
+                    matInput 
+                    formControlName="description" 
+                    placeholder="Añade una descripción para identificar este documento"
+                    rows="3"
+                  ></textarea>
+                  <mat-hint align="end">{{ uploadForm.get('description')?.value?.length || 0 }}/200</mat-hint>
+                </mat-form-field>
+                
+                <!-- Botón de subida -->
+                <div class="flex justify-content-end">
+                  <button 
+                    mat-raised-button 
+                    color="primary" 
+                    [disabled]="isUploading() || !selectedFile"
+                    (click)="uploadDocument()"
+                  >
+                    <span class="flex align-items-center">
+                      <mat-icon>upload</mat-icon>
+                      <span class="ml-2">Subir documento</span>
+                    </span>
+                  </button>
+                </div>
+                
+                <!-- Barra de progreso -->
+                @if (isUploading()) {
+                  <div class="mt-4">
+                    <mat-progress-bar 
+                      mode="determinate" 
+                      [value]="uploadProgress()"
+                      class="mb-2"
+                      color="accent"
+                    ></mat-progress-bar>
+                    <div class="text-center text-sm text-white">
+                      Procesando: {{ uploadProgress() }}%
+                    </div>
+                  </div>
+                }
+              </form>
+            </mat-card-content>
+          </mat-card>
+        </div>
+        
+        <!-- Card para la lista de documentos -->
+        <div class="col-12 md:col-7 lg:col-8">
+          <mat-card class="h-full glassmorphism-card">
+            <mat-card-header>
+              <mat-card-title class="text-xl">Documentos disponibles</mat-card-title>
+              <mat-card-subtitle>Administra los documentos utilizados por el chatbot</mat-card-subtitle>
+            </mat-card-header>
+            
+            <mat-card-content>
+              <!-- Estado de carga -->
+              @if (isLoading()) {
+                <div class="flex flex-column align-items-center justify-content-center py-6">
+                  <mat-spinner diameter="40" color="accent"></mat-spinner>
+                  <span class="mt-3 text-white">Cargando documentos...</span>
+                </div>
+              } @else if (!hasDocuments()) {
+                <!-- Sin documentos -->
+                <div class="empty-state">
+                  <mat-icon class="text-6xl text-white text-opacity-60">folder_open</mat-icon>
+                  <h3 class="text-xl font-medium text-white m-0 mb-2 mt-3">No hay documentos</h3>
+                  <p class="text-white text-opacity-70 m-0 mb-4">Sube documentos para entrenar al chatbot</p>
+                  <button mat-raised-button color="primary" (click)="fileInput.click()">
+                    <mat-icon>add</mat-icon>
+                    <span class="ml-1">Añadir documento</span>
+                  </button>
+                </div>
+              } @else {
+                <!-- Tabla de documentos -->
+                <div class="mat-elevation-z0">
+                  <table mat-table [dataSource]="documents()">
+                    <!-- Columna Nombre -->
+                    <ng-container matColumnDef="filename">
+                      <th mat-header-cell *matHeaderCellDef>Nombre</th>
+                      <td mat-cell *matCellDef="let doc" class="text-overflow-ellipsis overflow-hidden">
+                        <div class="flex align-items-center">
+                          <mat-icon class="text-white mr-2">description</mat-icon>
+                          <span class="text-overflow-ellipsis overflow-hidden text-white">{{ doc.filename }}</span>
+                        </div>
+                      </td>
+                    </ng-container>
+                    
+                    <!-- Columna Tamaño -->
+                    <ng-container matColumnDef="fileSize">
+                      <th mat-header-cell *matHeaderCellDef>Tamaño</th>
+                      <td mat-cell *matCellDef="let doc" class="text-white">{{ formatFileSize(doc.fileSize) }}</td>
+                    </ng-container>
+                    
+                    <!-- Columna Fecha -->
+                    <ng-container matColumnDef="uploadDate">
+                      <th mat-header-cell *matHeaderCellDef>Fecha</th>
+                      <td mat-cell *matCellDef="let doc" class="text-white">{{ doc.uploadDate | date:'dd/MM/yyyy HH:mm' }}</td>
+                    </ng-container>
+                    
+                    <!-- Columna Estado -->
+                    <ng-container matColumnDef="status">
+                      <th mat-header-cell *matHeaderCellDef>Estado</th>
+                      <td mat-cell *matCellDef="let doc">
+                        @switch (doc.status) {
+                          @case ('processed') {
+                            <mat-chip color="primary" selected class="min-w-max">
+                              <mat-icon>check_circle</mat-icon>
+                              <span class="ml-1">Procesado</span>
+                            </mat-chip>
+                          }
+                          @case ('processing') {
+                            <mat-chip color="accent" selected class="min-w-max">
+                              <mat-icon>hourglass_top</mat-icon>
+                              <span class="ml-1">Procesando</span>
+                            </mat-chip>
+                          }
+                          @case ('error') {
+                            <mat-chip color="warn" selected class="min-w-max">
+                              <mat-icon>error</mat-icon>
+                              <span class="ml-1">Error</span>
+                            </mat-chip>
+                          }
+                          @default {
+                            <mat-chip>Desconocido</mat-chip>
+                          }
+                        }
+                      </td>
+                    </ng-container>
+                    
+                    <!-- Columna Acciones -->
+                    <ng-container matColumnDef="actions">
+                      <th mat-header-cell *matHeaderCellDef>Acciones</th>
+                      <td mat-cell *matCellDef="let doc">
+                        <button mat-mini-fab color="warn" matTooltip="Eliminar documento" (click)="deleteDocument(doc.id)">
+                          <mat-icon>delete</mat-icon>
+                        </button>
+                      </td>
+                    </ng-container>
+                    
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                  </table>
+                </div>
+              }
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

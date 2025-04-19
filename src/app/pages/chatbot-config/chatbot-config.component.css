@@ -1,0 +1,249 @@
+/* Variables globales */
+:root {
+  --primary-gradient: linear-gradient(135deg, rgba(102, 126, 234, 0.8), rgba(118, 75, 162, 0.8));
+  --accent-gradient: linear-gradient(135deg, rgba(79, 172, 254, 0.8), rgba(0, 242, 254, 0.8));
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.2);
+  --glass-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+  --card-radius: 16px;
+  --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Estilos para tarjetas con efecto glassmorphism */
+.mat-mdc-card {
+  border-radius: var(--card-radius);
+  transition: var(--transition-smooth);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  background-color: rgba(17, 25, 40, 0.25);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.125);  
+  padding: 38px;  
+  filter: drop-shadow(0 30px 10px rgba(0,0,0,0.125));
+  border: var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  overflow: hidden;
+}
+
+.mat-mdc-card:hover {
+  box-shadow: 0 12px 36px rgba(31, 38, 135, 0.2);
+  transform: translateY(-2px);
+}
+
+.mat-mdc-card-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 16px;
+  margin-bottom: 8px;
+}
+
+.mat-mdc-card-title {
+  font-weight: 600 !important;
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Estilos para la zona de drop con efecto glassmorphism */
+.border-dashed {
+  border-radius: 12px;
+  transition: var(--transition-smooth);
+  min-height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+}
+
+.border-dashed::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  opacity: 0;
+  background: var(--accent-gradient);
+  transition: opacity 0.5s ease;
+}
+
+.border-dashed:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: scale(1.01);
+}
+
+.border-dashed:hover::before {
+  opacity: 0.1;
+}
+
+.border-dashed.dragging {
+  border-color: var(--primary-color, #3f51b5);
+  background-color: rgba(63, 81, 181, 0.08);
+  transform: scale(1.02);
+}
+
+.border-dashed.border-primary {
+  border-color: var(--primary-color, #3f51b5);
+  background-color: rgba(63, 81, 181, 0.06);
+}
+
+/* Ajustes para íconos */
+.text-6xl {
+  font-size: 3.5rem !important;
+  height: 3.5rem !important;
+  width: 3.5rem !important;
+  opacity: 0.8;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+}
+
+.text-4xl {
+  font-size: 2.5rem !important;
+  height: 2.5rem !important;
+  width: 2.5rem !important;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+/* Estilos para la tabla con efecto glassmorphism */
+.mat-elevation-z0 {
+  border-radius: var(--card-radius);
+  overflow: hidden;
+  animation: fadeIn 0.5s ease-in-out;
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.mat-mdc-table {
+  width: 100%;
+  background: transparent !important;
+}
+
+.mat-mdc-row {
+  transition: var(--transition-smooth);
+}
+
+.mat-mdc-row:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  transform: translateX(4px);
+}
+
+.mat-mdc-header-cell {
+  font-weight: 600;
+  color: var(--text-color-secondary, rgba(255, 255, 255, 0.7));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 14px;
+  padding: 16px 8px;
+}
+
+.mat-mdc-cell {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 12px 8px;
+}
+
+/* Estilo para chips más compactos */
+.min-w-max {
+  min-width: 90px;
+  height: 30px;
+  border-radius: 30px;
+  transition: var(--transition-smooth);
+}
+
+.min-w-max:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.min-w-max .mat-icon {
+  font-size: 16px;
+  height: 16px;
+  width: 16px;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.mat-mdc-progress-bar {
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+/* Botones y controles */
+.mat-mdc-raised-button {
+  border-radius: 30px;
+  padding: 0 24px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: var(--transition-smooth);
+}
+
+.mat-mdc-raised-button:hover:not([disabled]) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
+}
+
+.mat-mdc-form-field-outline {
+  border-radius: 8px;
+}
+
+/* Estado vacío estilizado */
+.empty-state {
+  padding: 3rem 2rem;
+  text-align: center;
+  animation: fadeIn 0.8s ease-out;
+}
+
+.empty-state .mat-icon {
+  animation: pulse 2s infinite ease-in-out;
+}
+
+/* Estilos oscuros o claros para una mejor visibilidad */
+.text-primary {
+  color: var(--primary-color, #3f51b5);
+}
+
+.text-accent {
+  color: var(--accent-color, #ff4081);
+}
+
+/* Fix horizontal scroll and center content */
+.gradient-background {
+  padding: 1rem;
+  overflow-x: hidden;
+}
+.gradient-background .grid {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .mat-column-uploadDate, 
+  .mat-column-fileSize {
+    display: none;
+  }
+  
+  .border-dashed {
+    min-height: 140px;
+  }
+  
+  .text-6xl {
+    font-size: 2.5rem !important;
+    height: 2.5rem !important;
+    width: 2.5rem !important;
+  }
+}
