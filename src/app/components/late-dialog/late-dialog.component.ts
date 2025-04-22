@@ -26,7 +26,7 @@ export class LateDialogComponent {
   validatorsService = inject(ValidatorsService);
 
   protected readonly lateForm: FormGroup = this.fb.group({
-    reason: ['', [Validators.required, Validators.minLength(10)]]
+    reason: ['', [Validators.required, Validators.minLength(5)]]
   });
 
   reason = computed(() => this.lateForm.controls['reason']);

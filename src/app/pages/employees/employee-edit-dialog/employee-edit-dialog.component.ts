@@ -35,7 +35,7 @@ export class EmployeeEditDialogComponent implements OnInit {
   private readonly employeesService = inject(EmployeesService);
   private readonly validatorsService = inject(ValidatorsService);
   public  readonly data = inject(MAT_DIALOG_DATA) as { employee: EmployeeDTO };
-  statusOptions = ['ACTIVO', 'Remoto', 'Vacaciones', 'Proyecto Especial'];
+  statusOptions = ['ACTIVO', 'BAJA', 'VACACIONES', 'INACTIVO'];
   submitting = false;
   error: string | null = null;
 

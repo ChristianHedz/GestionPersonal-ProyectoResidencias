@@ -19,19 +19,19 @@
     <div class="employee-status mb-3">
       <span class="status-badge px-2 py-1 border-round text-sm"
             [ngClass]="{
-              'bg-green-100 text-green-700': employee.status === 'Activo',
-              'bg-orange-100 text-orange-700': employee.status === 'Remoto',
-              'bg-blue-100 text-blue-700': employee.status === 'Vacaciones',
-              'bg-purple-100 text-purple-700': employee.status === 'Proyecto Especial',
-              'bg-gray-100 text-gray-700': !['Activo', 'Remoto', 'Vacaciones', 'Proyecto Especial'].includes(employee.status)
+              'bg-green-100 text-green-700': employee.status === 'ACTIVO',
+              'bg-orange-100 text-orange-700': employee.status === 'BAJA',
+              'bg-blue-100 text-blue-700': employee.status === 'VACACIONES',
+              'bg-purple-100 text-purple-700': employee.status === 'INACTIVO',
+              'bg-gray-100 text-gray-700': !['ACTIVO', 'BAJA', 'VACACIONES', 'INACTIVO'].includes(employee.status)
             }">
         <i class="pi" 
            [ngClass]="{
-             'pi-check-circle': employee.status === 'Activo',
-             'pi-home': employee.status === 'Remoto',
-             'pi-calendar': employee.status === 'Vacaciones',
-             'pi-briefcase': employee.status === 'Proyecto Especial',
-             'pi-user': !['Activo', 'Remoto', 'Vacaciones', 'Proyecto Especial'].includes(employee.status)
+             'pi-check-circle': employee.status === 'ACTIVO',
+             'pi-home': employee.status === 'BAJA',
+             'pi-calendar': employee.status === 'VACACIONES',
+             'pi-briefcase': employee.status === 'INACTIVO',
+             'pi-user': !['ACTIVO', 'BAJA', 'VACACIONES', 'INACTIVO'].includes(employee.status)
            }"></i>
         {{ employee.status }}
       </span>

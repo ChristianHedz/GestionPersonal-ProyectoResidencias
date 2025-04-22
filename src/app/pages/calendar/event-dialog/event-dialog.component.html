@@ -1,0 +1,110 @@
+<h2 mat-dialog-title>{{ dialogTitle() }}</h2>
+
+<form [formGroup]="eventForm" (ngSubmit)="onSubmit()">
+  <div mat-dialog-content class="event-form-content">
+    <!-- Title Field -->
+    <mat-form-field appearance="outline" class="w-full mb-3">
+      <mat-label>Titulo</mat-label>
+      <input matInput formControlName="title" placeholder="Event title">
+      <mat-error *ngIf="eventForm.get('title')?.hasError('required')">
+        El titulo es obligatorio
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Description Field -->
+    <mat-form-field appearance="outline" class="w-full mb-3">
+      <mat-label>Descripcion</mat-label>
+      <textarea matInput formControlName="description" placeholder="Event description" rows="3"></textarea>
+    </mat-form-field>
+
+    <!-- All Day Toggle -->
+    <div class="mb-3">
+      <mat-checkbox formControlName="allDay">Todo el dia</mat-checkbox>
+    </div>
+
+    <!-- Date Range -->
+    <div class="flex flex-row gap-2 mb-3">
+      <mat-form-field appearance="outline" class="w-6">
+        <mat-label>Fecha de inicio</mat-label>
+        <input matInput [matDatepicker]="startPicker" formControlName="startDate">
+        <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+        <mat-datepicker #startPicker></mat-datepicker>
+        <mat-error *ngIf="eventForm.get('startDate')?.hasError('required')">
+          Fecha de inicio es obligatoria
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="w-6">
+        <mat-label>Fecha de fin</mat-label>
+        <input matInput [matDatepicker]="endPicker" formControlName="endDate">
+        <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+        <mat-datepicker #endPicker></mat-datepicker>
+        <mat-error *ngIf="eventForm.get('endDate')?.hasError('required')">
+          Fecha de fin es obligatoria
+        </mat-error>
+      </mat-form-field>
+    </div>
+    <div *ngIf="!validateDateRange()" class="error-text mb-3">
+      Fecha de fin debe ser después de fecha de inicio
+    </div>
+
+    <!-- Event Type -->
+    <mat-form-field appearance="outline" class="w-full mb-3">
+      <mat-label>Tipo de evento</mat-label>
+      <mat-select formControlName="eventType">
+        <mat-option *ngFor="let type of eventTypes" [value]="type">
+          {{ type }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="eventForm.get('eventType')?.hasError('required')">
+        El tipo de evento es obligatorio
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Color Selector -->
+    <mat-form-field appearance="outline" class="w-full mb-3">
+      <mat-label>Color</mat-label>
+      <mat-select formControlName="color">
+        <mat-option *ngFor="let color of colorOptions" [value]="color.value">
+          <div class="flex align-items-center">
+            <div class="color-preview" [style.background-color]="color.value"></div>
+            <span>{{ color.name }}</span>
+          </div>
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <!-- Participants -->
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Empleados</mat-label>
+      <mat-select formControlName="participantIds" multiple>
+        <mat-option *ngFor="let employee of data.employees" [value]="employee.id">
+          {{ employee.fullName }}
+        </mat-option>
+      </mat-select>
+      <mat-hint>Selecciona los empleados que participarán en este evento</mat-hint>
+    </mat-form-field>
+
+    <!-- Selected Participants Preview -->
+    <div *ngIf="eventForm.get('participantIds')?.value?.length > 0" class="selected-participants mt-3">
+      <div class="text-sm text-secondary mb-2">Empleados seleccionados:</div>
+      <mat-chip-set>
+        <mat-chip *ngFor="let id of eventForm.get('participantIds')?.value" [removable]="true"
+          (removed)="removeParticipant(id)">
+          {{ getEmployeeName(id) }}
+          <mat-icon matChipRemove>cancel</mat-icon>
+        </mat-chip>
+      </mat-chip-set>
+    </div>
+  </div>
+
+  <mat-dialog-actions align="end">
+    <button *ngIf="data.mode === 'edit'" mat-button color="warn" type="button" (click)="onDelete()">
+      <mat-icon>delete</mat-icon> Eliminar
+    </button>
+    <button mat-button type="button" (click)="onCancel()">Cancelar</button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="eventForm.invalid || !validateDateRange()">
+      {{ submitButtonText() }}
+    </button>
+  </mat-dialog-actions>
+</form>
