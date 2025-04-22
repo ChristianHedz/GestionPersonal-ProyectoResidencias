@@ -1,0 +1,32 @@
+.calendar-container {
+  height: 100%;
+  width: 100%;
+}
+
+.calendar-wrapper {
+  height: calc(100vh - 200px);
+  position: relative;
+}
+
+::ng-deep .fc .fc-toolbar-title {
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+::ng-deep .fc-event {
+  cursor: pointer;
+}
+
+::ng-deep .fc-event:hover {
+  filter: brightness(90%);
+}
+
+::ng-deep .error-snackbar {
+  background-color: #f44336;
+  color: white;
+}
+
+::ng-deep .success-snackbar {
+  background-color: #4caf50;
+  color: white;
+}

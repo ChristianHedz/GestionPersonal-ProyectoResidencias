@@ -1,0 +1,27 @@
+<app-toolbar></app-toolbar>
+<div class="calendar-container ">
+  <mat-card class="mb-3 m-3">
+    <mat-card-header>
+      <mat-card-title class="text-xl font-medium">Calendario con eventos</mat-card-title>
+      <mat-card-subtitle>Manejar eventos, vacaciones, dias festivos entre otros</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content class="p-0 m-3">
+      <div class="flex justify-content-end mb-3">
+        <button mat-raised-button color="primary" (click)="createNewEvent()">
+          <mat-icon>add</mat-icon>
+          Agregar Evento
+        </button>
+      </div>
+
+      <div class="calendar-wrapper">
+        <div *ngIf="isLoading()" class="flex justify-content-center align-items-center h-full">
+          <mat-spinner [diameter]="50"></mat-spinner>
+        </div>
+        
+        <div [style.visibility]="isLoading() ? 'hidden' : 'visible'">
+          <full-calendar #calendar [options]="calendarOptions"></full-calendar>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
