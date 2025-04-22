@@ -13,7 +13,7 @@ import { EmployeeProfileComponent } from '../pages/employee-profile/employee-pro
 
 const routes: Routes = [
   {
-    path: 'inicio',
+    path: 'registro',
     component: DashboardComponent,
     // canMatch: [isAuthGuard]
   },
@@ -52,7 +52,7 @@ const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: 'inicio',
+    redirectTo: 'home',
     pathMatch: 'full'
   }
 ];

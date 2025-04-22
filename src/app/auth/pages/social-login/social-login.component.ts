@@ -22,13 +22,13 @@ export class SocialLoginComponent implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
-
+  
   ngOnInit(): void {
     this.socialAuthService.authState
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (user: SocialUser) => {
-          if (user) {
+    .pipe(takeUntilDestroyed(this.destroyRef))
+    .subscribe({
+      next: (user: SocialUser) => {
+        if (user) {
             this.handleGoogleSignIn(user);
           }
         },
@@ -37,15 +37,15 @@ export class SocialLoginComponent implements OnInit {
           this.showErrorMessage('Error al iniciar sesión con Google');
         }
       });
-  }
-
-  private handleGoogleSignIn(user: SocialUser): void {
+    }
+    
+    private handleGoogleSignIn(user: SocialUser): void {
     if (user && user.idToken) {
       this.authService.googleLogin(user.idToken)
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: () => {
-            this.router.navigateByUrl('/admin/inicio');
+            this.router.navigateByUrl('/admin/home');
           },
           error: (error: HttpErrorResponse | Error) => {
             console.error('Google login error:', error);

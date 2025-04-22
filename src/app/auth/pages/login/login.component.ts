@@ -66,7 +66,7 @@ export class LoginComponent{
         .subscribe({
           next: (employee: AuthResponse) => {
             Swal.fire('¡Inicio de sesión exitoso!', 'Has iniciado sesión correctamente', 'success');
-            employee.role === 'ADMIN' ? this.router.navigateByUrl('/admin/inicio')
+            employee.role === 'ADMIN' ? this.router.navigateByUrl('/admin/home')
              : this.router.navigateByUrl('/admin/info');
           },
           error: (error: ApiError) => {
