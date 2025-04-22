@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../auth/service/auth.service';
@@ -10,9 +10,10 @@ import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-toolbar',
-  imports: [MatToolbarModule,MatIconModule, MatMenuModule,MatMenuTrigger,MatButtonModule, RouterModule],
+  standalone: true,
+  imports: [MatToolbarModule, MatIconModule, MatMenuModule, MatButtonModule, RouterModule],
   templateUrl: './toolbar.component.html',
-  styleUrl: './toolbar.component.css'
+  styleUrls: ['./toolbar.component.css']
 })
 export class ToolbarComponent {
 
@@ -46,5 +47,3 @@ export class ToolbarComponent {
     });
   }      
 }
-
-

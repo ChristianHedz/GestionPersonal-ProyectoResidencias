@@ -1,15 +1,26 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router, NavigationEnd, ActivatedRoute } from '@angular/router';
+import { filter, map } from 'rxjs/operators';
+import { ToolbarComponent } from '../../shared/toolbar/toolbar.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [MatIcon,RouterModule,CommonModule],
+  imports: [MatIcon, RouterModule, CommonModule, ToolbarComponent],
   templateUrl: './home.component.html',
-  styleUrl: './home.component.css'
+  styleUrls: ['./home.component.css']
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
+
+  private readonly route = inject(ActivatedRoute);
+  isAdmin = false;
+
+  ngOnInit(): void {
+    this.route.data
+      .pipe(map(data => data['mode'] === 'admin'))
+      .subscribe(isAdmin => this.isAdmin = isAdmin);
+  }
 
 }

@@ -9,7 +9,8 @@ export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'registro', component: RegisterComponent },
   { path: 'login', component: LoginComponent, canMatch: [isNotAuthGuard] },
-  { path: 'home', component: HomeComponent },
+  { path: 'home', component: HomeComponent, data: { mode: 'user' } },
+  { path: 'admin/home', component: HomeComponent, data: { mode: 'admin' } },
   { path: 'calendar', component: CalendarComponent },
   {
     path: 'admin',
