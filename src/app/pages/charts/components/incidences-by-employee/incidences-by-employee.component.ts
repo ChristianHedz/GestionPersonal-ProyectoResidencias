@@ -42,7 +42,7 @@ export class IncidencesByEmployeeComponent {
   // Available chart types
   chartTypes = signal<ChartTypeOption[]>([
     { value: CHART_TYPES.BAR, label: 'Barras' },
-    { value: CHART_TYPES.HORIZONTAL_BAR, label: 'Barras horizontales' },
+    { value: CHART_TYPES.HORIZONTAL_BAR, label: 'Horizontales' },
     { value: CHART_TYPES.LINE, label: 'Línea' }
   ]);
   
