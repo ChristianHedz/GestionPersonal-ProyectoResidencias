@@ -13,8 +13,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { EventService } from '../../service/event.service';
 import { EmployeesService } from '../../service/employees.service';
-import { Event, EventType, CalendarEvent } from '../../interfaces/event.interfaces';
 import { EventDialogComponent } from './event-dialog/event-dialog.component';
+import { Event, EventType, CalendarEvent } from '../../interfaces/event.interfaces';
 import { EmployeeDTO } from '../../auth/interfaces/EmployeeDTO';
 import { ToolbarComponent } from '../../shared/toolbar/toolbar.component';
 
@@ -28,7 +28,6 @@ import { ToolbarComponent } from '../../shared/toolbar/toolbar.component';
     MatIconModule,
     MatCardModule,
     MatProgressSpinnerModule,
-    EventDialogComponent,
     ToolbarComponent
   ],
   templateUrl: './calendar.component.html',
