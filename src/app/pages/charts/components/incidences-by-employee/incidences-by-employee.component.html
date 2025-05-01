@@ -1,18 +1,20 @@
 <mat-card class="chart-card p-0">
   <mat-card-header class="flex justify-content-center align-items-center mb-3">
-    <mat-card-title>Incidencias por Empleado</mat-card-title>
-    <mat-card-subtitle>Faltas y retardos por semana</mat-card-subtitle>
+    <mat-card-title class="text-center">Incidencias por Empleado</mat-card-title>
+    <mat-card-subtitle class="text-center">Faltas y retardos por semana</mat-card-subtitle>
   </mat-card-header>
   <mat-card-content>
     <div class="controls-container flex justify-content-center align-items-center md:justify-content-between">
       <div class="control-group">
         <mat-form-field appearance="fill">
-          <mat-label>Semana</mat-label>
-          <mat-select [value]="selectedWeek()" (valueChange)="onWeekChange($event)">
-            <mat-option *ngFor="let week of weekOptions()" [value]="week.value">
-              {{ week.label }}
-            </mat-option>
-          </mat-select>
+          <mat-label>Rango de fechas</mat-label>
+          <mat-date-range-input [formGroup]="dateRangeForm" [rangePicker]="picker">
+            <input matStartDate formControlName="startDate" placeholder="Fecha inicial">
+            <input matEndDate formControlName="endDate" placeholder="Fecha final">
+          </mat-date-range-input>
+          <mat-hint>DD/MM/YYYY – DD/MM/YYYY</mat-hint>
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-date-range-picker #picker></mat-date-range-picker>
         </mat-form-field>
       </div>
       

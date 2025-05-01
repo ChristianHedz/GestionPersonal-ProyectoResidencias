@@ -56,3 +56,42 @@ tr:hover {
     padding: 8px;
   }
 }
+
+/* Loading, error and no-data states */
+.loading-container {
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-container span {
+  margin-left: 12px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.error-container {
+  min-height: 300px;
+  background-color: rgba(244, 67, 54, 0.05);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.error-message {
+  color: #f44336;
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+
+.no-data-container {
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(0, 0, 0, 0.54);
+  background-color: rgba(245, 245, 245, 0.6);
+  border-radius: 8px;
+}

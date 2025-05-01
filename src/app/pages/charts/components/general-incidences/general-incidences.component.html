@@ -1,18 +1,21 @@
 <mat-card class="chart-card">
   <mat-card-header class="flex justify-content-center align-items-center mb-3">
-    <mat-card-title>Incidencias Generales</mat-card-title>
-    <mat-card-subtitle>Vista general de faltas y retardos</mat-card-subtitle>
+    <mat-card-title class="text-center">Incidencias Generales</mat-card-title>
+    <mat-card-subtitle class="text-center">Vista general de faltas y retardos</mat-card-subtitle>
   </mat-card-header>
   <mat-card-content>
+    <!-- Controls - always visible -->
     <div class="controls-container flex justify-content-center align-items-center md:justify-content-between">
       <div class="control-group">
         <mat-form-field appearance="fill">
-          <mat-label>Semana</mat-label>
-          <mat-select [value]="selectedWeek()" (valueChange)="onWeekChange($event)">
-            <mat-option *ngFor="let week of weekOptions()" [value]="week.value">
-              {{ week.label }}
-            </mat-option>
-          </mat-select>
+          <mat-label>Rango de fechas</mat-label>
+          <mat-date-range-input [formGroup]="dateRangeForm" [rangePicker]="picker">
+            <input matStartDate formControlName="startDate" placeholder="Fecha inicial">
+            <input matEndDate formControlName="endDate" placeholder="Fecha final">
+          </mat-date-range-input>
+          <mat-hint>DD/MM/YYYY – DD/MM/YYYY</mat-hint>
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-date-range-picker #picker></mat-date-range-picker>
         </mat-form-field>
       </div>
       
@@ -25,24 +28,41 @@
       </div>
     </div>
 
-    <div class="chart-container">
-      <canvas baseChart
-        [data]="chartDisplayData()"
-        [options]="chartOptions()"
-        [type]="selectedChartType()">
-      </canvas>
+    <!-- Loading spinner -->
+    <div *ngIf="isLoading()" class="loading-container flex justify-content-center align-items-center p-4">
+      <mat-spinner diameter="40"></mat-spinner>
+      <span class="ml-2">Cargando datos...</span>
     </div>
-    
-    <div *ngIf="chartData()" class="summary-container">
-      <div class="summary-item">
-        <strong>Total Empleados:</strong> {{ chartData()?.employeeCount }}
+
+    <!-- Error message -->
+    <div *ngIf="error()" class="error-container p-4 text-center">
+      <p class="error-message">{{ error() }}</p>
+      <button mat-raised-button color="primary" (click)="loadChartData()">Reintentar</button>
+    </div>
+
+    <!-- Content when data is loaded -->
+    <ng-container *ngIf="!isLoading() && !error() && chartData()">
+      <div class="chart-container">
+        <canvas baseChart
+          [data]="chartDisplayData()"
+          [options]="chartOptions()"
+          [type]="selectedChartType()">
+        </canvas>
       </div>
-      <div class="summary-item">
-        <strong>Total Faltas:</strong> {{ chartData()?.totalAbsences }}
+      
+      <div class="summary-container">
+        <div class="summary-item">
+          <strong>Total Faltas:</strong> {{ chartData()?.totalAbsences }}
+        </div>
+        <div class="summary-item">
+          <strong>Total Retardos:</strong> {{ chartData()?.totalDelays }}
+        </div>
       </div>
-      <div class="summary-item">
-        <strong>Total Retardos:</strong> {{ chartData()?.totalDelays }}
-      </div>
+    </ng-container>
+
+    <!-- No data message -->
+    <div *ngIf="!isLoading() && !error() && !chartData()" class="no-data-container p-4 text-center">
+      <p>No hay datos de incidencias disponibles para el rango de fechas seleccionado.</p>
     </div>
   </mat-card-content>
 </mat-card>

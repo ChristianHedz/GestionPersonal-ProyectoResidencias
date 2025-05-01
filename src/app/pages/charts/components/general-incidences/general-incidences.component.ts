@@ -1,16 +1,21 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, computed, effect, inject, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCardModule } from '@angular/material/card';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
+import { catchError, finalize } from 'rxjs/operators';
+import { of } from 'rxjs';
 import { ChartDataService } from '../../../../services/chart-data.service';
-import { ChartTypeOption, GeneralIncidenceData, WeekOption } from '../../../../interfaces/chart-data.interface';
+import { ChartTypeOption, DateRange, GeneralIncidenceData } from '../../../../interfaces/chart-data.interface';
 import { CHART_TYPES } from '../../chart-config';
 
 @Component({
@@ -25,33 +30,34 @@ import { CHART_TYPES } from '../../chart-config';
     MatSelectModule,
     MatButtonModule,
     MatButtonToggleModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatProgressSpinnerModule,
     BaseChartDirective
   ],
   templateUrl: './general-incidences.component.html',
   styleUrls: ['./general-incidences.component.css']
 })
-export class GeneralIncidencesComponent {
+export class GeneralIncidencesComponent implements OnInit {
   private chartDataService = inject(ChartDataService);
   private destroyRef = inject(DestroyRef);
+  private fb = inject(FormBuilder);
 
+  // Form for date range
+  dateRangeForm!: FormGroup;
+  
   // State management with signals
-  selectedWeek = signal<number>(1);
+  selectedDateRange = signal<DateRange>(this.getDefaultDateRange());
   selectedChartType = signal<ChartType>(CHART_TYPES.BAR);
   chartData = signal<GeneralIncidenceData | null>(null);
+  isLoading = signal<boolean>(false);
+  error = signal<string | null>(null);
   
   // Available chart types
   chartTypes = signal<ChartTypeOption[]>([
     { value: CHART_TYPES.BAR, label: 'Barras' },
     { value: CHART_TYPES.PIE, label: 'Circular' },
     { value: CHART_TYPES.DOUGHNUT, label: 'Dona' }
-  ]);
-  
-  // Week options
-  weekOptions = signal<WeekOption[]>([
-    { value: 1, label: 'Semana 1' },
-    { value: 2, label: 'Semana 2' },
-    { value: 3, label: 'Semana 3' },
-    { value: 4, label: 'Semana 4' }
   ]);
 
   // Chart configuration
@@ -103,23 +109,56 @@ export class GeneralIncidencesComponent {
     }
   });
 
-  constructor() {
+  ngOnInit(): void {
+    // Initialize date range form
+    const defaultRange = this.getDefaultDateRange();
+    this.dateRangeForm = this.fb.group({
+      startDate: [defaultRange.startDate],
+      endDate: [defaultRange.endDate]
+    });
+
+    // Watch for date range changes
+    this.dateRangeForm.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(range => {
+        if (range.startDate && range.endDate) {
+          this.onDateRangeChange({
+            startDate: range.startDate,
+            endDate: range.endDate
+          });
+        }
+      });
+    
     // Initialize data
     this.loadChartData();
-    
-    // Create effect to reload data when week changes
-    effect(() => {
-      const week = this.selectedWeek();
-      this.loadChartData();
-    });
   }
 
-  // Load data for the selected week
+  // Helper function to get default date range (first day of month to current date)
+  private getDefaultDateRange(): DateRange {
+    const today = new Date();
+    const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    return { startDate: firstDayOfMonth, endDate: today };
+  }
+
+  // Load data for the selected date range
   loadChartData(): void {
-    this.chartDataService.getGeneralIncidences(this.selectedWeek())
-      .pipe(takeUntilDestroyed(this.destroyRef))
+    this.isLoading.set(true);
+    this.error.set(null);
+    
+    this.chartDataService.getGeneralIncidences(this.selectedDateRange())
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        catchError(err => {
+          console.error('Error loading general incidence data:', err);
+          this.error.set('Error al cargar los datos de incidencias generales. Por favor, intente nuevamente.');
+          return of(null);
+        }),
+        finalize(() => this.isLoading.set(false))
+      )
       .subscribe(data => {
-        this.chartData.set(data);
+        if (data) {
+          this.chartData.set(data);
+        }
       });
   }
 
@@ -128,8 +167,9 @@ export class GeneralIncidencesComponent {
     this.selectedChartType.set(chartType as ChartType);
   }
 
-  // Change selected week
-  onWeekChange(week: number): void {
-    this.selectedWeek.set(week);
+  // Change selected date range
+  onDateRangeChange(dateRange: DateRange): void {
+    this.selectedDateRange.set(dateRange);
+    this.loadChartData();
   }
 }

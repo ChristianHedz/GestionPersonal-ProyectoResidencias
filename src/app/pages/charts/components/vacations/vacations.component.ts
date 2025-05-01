@@ -3,7 +3,10 @@ import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCardModule } from '@angular/material/card';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
+import { catchError, finalize } from 'rxjs/operators';
+import { of } from 'rxjs';
 import { ChartDataService } from '../../../../services/chart-data.service';
 import { ChartTypeOption, EmployeeVacationData } from '../../../../interfaces/chart-data.interface';
 import { BaseChartDirective } from 'ng2-charts';
@@ -14,6 +17,7 @@ import { BaseChartDirective } from 'ng2-charts';
     CommonModule,
     MatCardModule,
     MatButtonToggleModule,
+    MatProgressSpinnerModule,
     BaseChartDirective
   ],
   templateUrl: './vacations.component.html',
@@ -26,6 +30,8 @@ export class VacationsComponent {
   // State management with signals
   selectedChartType = signal<ChartType>('bar');
   chartData = signal<EmployeeVacationData[]>([]);
+  isLoading = signal<boolean>(false);
+  error = signal<string | null>(null);
   
   // Available chart types
   chartTypes = signal<ChartTypeOption[]>([
@@ -136,10 +142,21 @@ export class VacationsComponent {
     this.loadVacationData();
   }
 
-  // Load vacation data
+  // Load vacation data from the backend API
   loadVacationData(): void {
+    this.isLoading.set(true);
+    this.error.set(null);
+    
     this.chartDataService.getEmployeeVacations()
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        catchError(err => {
+          console.error('Error loading vacation data:', err);
+          this.error.set('Error al cargar los datos de vacaciones. Por favor, intente nuevamente.');
+          return of([]);
+        }),
+        finalize(() => this.isLoading.set(false))
+      )
       .subscribe(data => {
         this.chartData.set(data);
       });

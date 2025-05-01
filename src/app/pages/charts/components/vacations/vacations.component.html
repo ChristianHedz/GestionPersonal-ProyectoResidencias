@@ -4,43 +4,63 @@
     <mat-card-subtitle class="text-center">Días de vacaciones disponibles y tomados</mat-card-subtitle>
   </mat-card-header>
   <mat-card-content>
-    <div class="controls-container flex justify-content-center align-items-center">
-      <div class="control-group">
-        <mat-button-toggle-group [value]="selectedChartType()" (change)="onChartTypeChange($event.value)">
-          <mat-button-toggle *ngFor="let type of chartTypes()" [value]="type.value">
-            {{ type.label }}
-          </mat-button-toggle>
-        </mat-button-toggle-group>
-      </div>
+    <!-- Loading spinner -->
+    <div *ngIf="isLoading()" class="loading-container flex justify-content-center align-items-center p-4">
+      <mat-spinner diameter="40"></mat-spinner>
+      <span class="ml-2">Cargando datos...</span>
     </div>
 
-    <div class="chart-container">
-      <canvas baseChart
-        [data]="chartDisplayData()"
-        [options]="chartOptions()"
-        [type]="selectedChartType()">
-      </canvas>
+    <!-- Error message -->
+    <div *ngIf="error()" class="error-container p-4 text-center">
+      <p class="error-message">{{ error() }}</p>
+      <button mat-raised-button color="primary" (click)="loadVacationData()">Reintentar</button>
     </div>
-    
-    <div class="vacation-table" *ngIf="chartData().length > 0">
-      <table>
-        <thead>
-          <tr>
-            <th>Empleado</th>
-            <th>Días Totales</th>
-            <th>Días Tomados</th>
-            <th>Días Disponibles</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let item of chartData()">
-            <td>{{ item.employeeName }}</td>
-            <td>{{ item.vacationDaysTotal }}</td>
-            <td>{{ item.vacationDaysTaken }}</td>
-            <td>{{ item.vacationDaysAvailable }}</td>
-          </tr>
-        </tbody>
-      </table>
+
+    <!-- Content when data is loaded -->
+    <ng-container *ngIf="!isLoading() && !error() && chartData().length > 0">
+      <div class="controls-container flex justify-content-center align-items-center">
+        <div class="control-group">
+          <mat-button-toggle-group [value]="selectedChartType()" (change)="onChartTypeChange($event.value)">
+            <mat-button-toggle *ngFor="let type of chartTypes()" [value]="type.value">
+              {{ type.label }}
+            </mat-button-toggle>
+          </mat-button-toggle-group>
+        </div>
+      </div>
+
+      <div class="chart-container">
+        <canvas baseChart
+          [data]="chartDisplayData()"
+          [options]="chartOptions()"
+          [type]="selectedChartType()">
+        </canvas>
+      </div>
+      
+      <div class="vacation-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Empleado</th>
+              <th>Días Totales</th>
+              <th>Días Tomados</th>
+              <th>Días Disponibles</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of chartData()">
+              <td>{{ item.employeeName }}</td>
+              <td>{{ item.vacationDaysTotal }}</td>
+              <td>{{ item.vacationDaysTaken }}</td>
+              <td>{{ item.vacationDaysAvailable }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </ng-container>
+
+    <!-- No data message -->
+    <div *ngIf="!isLoading() && !error() && chartData().length === 0" class="no-data-container p-4 text-center">
+      <p>No hay datos de vacaciones disponibles.</p>
     </div>
   </mat-card-content>
 </mat-card>
