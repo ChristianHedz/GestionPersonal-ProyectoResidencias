@@ -3,6 +3,10 @@
   width: 100%;
 }
 
+.trans {
+  background-color: transparent !important;
+}
+
 .calendar-wrapper {
   height: calc(100vh - 200px);
   position: relative;
@@ -29,4 +33,34 @@
 ::ng-deep .success-snackbar {
   background-color: #4caf50;
   color: white;
+}
+
+/* Aplicar transparencia a todos los elementos del calendario */
+::ng-deep .fc,
+::ng-deep .fc-view,
+::ng-deep .fc-view-harness,
+::ng-deep .fc-scrollgrid,
+::ng-deep .fc-scrollgrid-section,
+::ng-deep .fc-scrollgrid-section-body,
+::ng-deep .fc-scrollgrid-section-footer,
+::ng-deep .fc-scrollgrid-section-header,
+::ng-deep .fc-scrollgrid-sync-table,
+::ng-deep .fc-daygrid,
+::ng-deep .fc-daygrid-body,
+::ng-deep .fc-daygrid-bg,
+::ng-deep .fc-daygrid-day,
+::ng-deep .fc-daygrid-day-frame,
+::ng-deep .fc-daygrid-day-bg,
+::ng-deep .fc-day-today,
+::ng-deep .fc-day-past,
+::ng-deep .fc-day-future {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* Asegurar que los eventos mantengan sus colores */
+::ng-deep .fc-event {
+  border: none !important;
+  border-radius: 4px !important;
+  padding: 2px 4px !important;
 }

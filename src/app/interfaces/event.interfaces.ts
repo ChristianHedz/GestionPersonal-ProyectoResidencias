@@ -4,10 +4,10 @@ import { EmployeeDTO } from '../auth/interfaces/EmployeeDTO';
  * Enum representing different types of events
  */
 export enum EventType {
-  MEETING = 'REUNION',
-  HOLIDAY = 'FESTIVO',
-  TRAINING = 'CAPACITACION',
-  OTHER = 'OTRO'
+  MEETING = 'OTHER',
+  HOLIDAY = 'VACATION',
+  TRAINING = 'REMINDER',
+  OTHER = 'MEETING'
 }
 
 /**

@@ -11,10 +11,11 @@ import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
-import { EventService } from '../../service/event.service';
 import { EmployeesService } from '../../service/employees.service';
 import { EventDialogComponent } from './event-dialog/event-dialog.component';
-import { Event, EventType, CalendarEvent } from '../../interfaces/event.interfaces';
+import { CalendarService } from '../../core/services/calendar.service';
+import { CalendarEventDTO } from '../../core/models/calendar-event.dto';
+import { EventType, CalendarEvent } from '../../interfaces/event.interfaces';
 import { EmployeeDTO } from '../../auth/interfaces/EmployeeDTO';
 import { ToolbarComponent } from '../../shared/toolbar/toolbar.component';
 
@@ -35,7 +36,7 @@ import { ToolbarComponent } from '../../shared/toolbar/toolbar.component';
 })
 export class CalendarComponent implements OnInit {
   // Services
-  private readonly eventService = inject(EventService);
+  private readonly calendarService = inject(CalendarService);
   private readonly employeeService = inject(EmployeesService);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
@@ -81,8 +82,8 @@ export class CalendarComponent implements OnInit {
    */
   loadEvents(): void {
     this.isLoading.set(true);
-    this.eventService.getAllEvents().subscribe({
-      next: (events) => {
+    this.calendarService.getEvents().subscribe({
+      next: (events: CalendarEventDTO[]) => {
         const calendarEvents = this.mapToCalendarEvents(events);
         this.calendarEvents.set(calendarEvents);
         this.updateCalendarEvents(calendarEvents);
@@ -112,21 +113,42 @@ export class CalendarComponent implements OnInit {
   }
 
   /**
-   * Maps backend events to FullCalendar event format
+   * Maps backend events (CalendarEventDTO) to FullCalendar event format (CalendarEvent)
    */
-  mapToCalendarEvents(events: Event[]): CalendarEvent[] {
-    return events.map(event => ({
-      id: event.id?.toString() || '',
-      title: event.title,
-      start: new Date(event.startDate).toISOString(),
-      end: new Date(event.endDate).toISOString(),
-      allDay: event.allDay,
-      backgroundColor: event.color,
-      borderColor: event.color,
-      description: event.description,
-      eventType: event.eventType,
-      participants: event.participants
-    }));
+  mapToCalendarEvents(events: CalendarEventDTO[]): CalendarEvent[] {
+    return events.map(event => {
+      const participants: EmployeeDTO[] = event.employeeIds
+        ? event.employeeIds
+            .map(id => this.employees().find(emp => emp.id === id))
+            .filter((emp): emp is EmployeeDTO => emp !== undefined)
+        : [];
+      
+      // Intentar inferir allDay si las fechas son a medianoche y abarcan un día completo.
+      // FullCalendar también tiene su propia lógica para esto si solo se proporcionan fechas.
+      const start = new Date(event.startDate);
+      const end = new Date(event.endDate);
+      const isMidnightStart = start.getHours() === 0 && start.getMinutes() === 0 && start.getSeconds() === 0;
+      const isMidnightEnd = end.getHours() === 0 && end.getMinutes() === 0 && end.getSeconds() === 0;
+      let inferredAllDay = false;
+      if (isMidnightStart && isMidnightEnd && (end.getTime() - start.getTime()) % (24 * 60 * 60 * 1000) === 0 && (end.getTime() - start.getTime()) >= (24 * 60 * 60 * 1000)) {
+        inferredAllDay = true;
+      } else if (isMidnightStart && event.endDate === event.startDate) { // Evento de un solo día sin hora específica
+        inferredAllDay = true;
+      }
+
+      return {
+        id: event.id!.toString(),
+        title: event.title,
+        start: event.startDate,
+        end: event.endDate,
+        allDay: inferredAllDay, // Usar el allDay inferido o el que FullCalendar determine
+        backgroundColor: '#3788d8', // Color por defecto para eventos del backend
+        borderColor: '#3788d8',   // Color por defecto
+        description: event.description || '',
+        eventType: event.eventType,
+        participants: participants
+      };
+    });
   }
 
   /**
@@ -172,14 +194,27 @@ export class CalendarComponent implements OnInit {
         mode: 'create',
         start: selectInfo.startStr,
         end: selectInfo.endStr,
-        allDay: selectInfo.allDay,
+        allDay: selectInfo.allDay, // El diálogo aún puede usarlo para la UI inicial
         employees: this.employees()
       }
     });
 
     dialogRef.afterClosed().subscribe(result => {
+      console.log('Resultado del diálogo:', result);
       if (result) {
-        this.eventService.createEvent(result).subscribe({
+        // Construir el DTO explícitamente para asegurar que todos los campos necesarios,
+        // incluyendo employeeIds, se tomen del resultado del diálogo.
+        // Se asume que 'result' contiene: title, description, startDate, endDate, eventType, y employeeIds.
+        const dtoToSend: CalendarEventDTO = {
+          title: result.title,
+          description: result.description,
+          startDate: result.startDate,
+          endDate: result.endDate,
+          eventType: result.eventType,
+          employeeIds: result.participantIds || [] // Tomar employeeIds del resultado; si no existe, usar un array vacío.
+        };
+
+        this.calendarService.createEvent(dtoToSend).subscribe({
           next: () => {
             this.loadEvents();
             this.showNotification('Event created successfully', 'success');
@@ -190,7 +225,6 @@ export class CalendarComponent implements OnInit {
           }
         });
       }
-      // Clear date selection
       const calendarApi = selectInfo.view.calendar;
       if (calendarApi) {
         calendarApi.unselect();
@@ -204,24 +238,40 @@ export class CalendarComponent implements OnInit {
   handleEventClick(clickInfo: any): void {
     const eventId = parseInt(clickInfo.event.id, 10);
     
-    this.eventService.getEventById(eventId).subscribe({
-      next: (event) => {
+    this.calendarService.getEventById(eventId).subscribe({
+      next: (event: CalendarEventDTO) => { // event (DTO) no tendrá allDay ni color
         const dialogRef = this.dialog.open(EventDialogComponent, {
           width: '600px',
           data: {
             mode: 'edit',
-            event,
+            event: {
+              ...event, // DTO del backend
+              // El diálogo puede necesitar valores por defecto para allDay/color para el formulario si los usa
+              // Aquí podrías pasar el allDay/color del evento de FullCalendar si fuera necesario para la UI del diálogo
+              allDay: clickInfo.event.allDay, // Pasar el allDay del evento de FullCalendar
+              color: clickInfo.event.backgroundColor // Pasar el color del evento de FullCalendar
+            },
             employees: this.employees()
           }
         });
 
-        dialogRef.afterClosed().subscribe(result => {
-          if (!result) return;
+        dialogRef.afterClosed().subscribe(dialogResult => {
+          if (!dialogResult) return;
           
-          if (result === 'delete') {
+          if (dialogResult === 'delete') {
             this.deleteEvent(eventId);
           } else {
-            this.updateEvent(eventId, result);
+            // Construir el DTO explícitamente.
+            // Se asume que 'dialogResult' contiene: title, description, startDate, endDate, eventType, y employeeIds.
+            const dtoToSend: CalendarEventDTO = {
+              title: dialogResult.title,
+              description: dialogResult.description,
+              startDate: dialogResult.startDate,
+              endDate: dialogResult.endDate,
+              eventType: dialogResult.eventType,
+              employeeIds: dialogResult.employeeIds || [] // Tomar employeeIds del resultado; si no existe, usar un array vacío.
+            };
+            this.updateEvent(eventId, dtoToSend);
           }
         });
       },
@@ -235,22 +285,8 @@ export class CalendarComponent implements OnInit {
   /**
    * Updates an event
    */
-  updateEvent(eventId: number, eventData: any): void {
-    // Ensure eventData matches EventRequest interface
-    if (!eventData.participantIds && eventData.participants) {
-      eventData = {
-        title: eventData.title,
-        description: eventData.description,
-        startDate: eventData.startDate,
-        endDate: eventData.endDate,
-        eventType: eventData.eventType,
-        color: eventData.color,
-        allDay: eventData.allDay,
-        participantIds: eventData.participants.map((p: any) => p.id)
-      };
-    }
-    
-    this.eventService.updateEvent(eventId, eventData).subscribe({
+  updateEvent(eventId: number, eventData: CalendarEventDTO): void { // eventData ya no debería tener allDay/color
+    this.calendarService.updateEvent(eventId, eventData).subscribe({
       next: () => {
         this.loadEvents();
         this.showNotification('Event updated successfully', 'success');
@@ -266,7 +302,7 @@ export class CalendarComponent implements OnInit {
    * Deletes an event
    */
   deleteEvent(eventId: number): void {
-    this.eventService.deleteEvent(eventId).subscribe({
+    this.calendarService.deleteEvent(eventId).subscribe({
       next: () => {
         this.loadEvents();
         this.showNotification('Event deleted successfully', 'success');
@@ -283,27 +319,26 @@ export class CalendarComponent implements OnInit {
    */
   handleEventDrop(dropInfo: any): void {
     const eventId = parseInt(dropInfo.event.id, 10);
-    const startDate = dropInfo.event.start.toISOString();
-    const endDate = dropInfo.event.end?.toISOString() || 
-                   new Date(dropInfo.event.start.getTime() + 60 * 60 * 1000).toISOString();
     
-    this.eventService.getEventById(eventId).subscribe({
-      next: (event) => {
-        // Transform to EventRequest format
-        const eventRequest = {
-          title: event.title,
-          description: event.description,
-          startDate,
-          endDate,
-          eventType: event.eventType,
-          color: event.color,
-          allDay: event.allDay,
-          participantIds: event.participants.map(p => p.id)
+    this.calendarService.getEventById(eventId).subscribe({
+      next: (originalEvent: CalendarEventDTO) => { // originalEvent (DTO) no tiene allDay ni color
+        const updatedEventData: Partial<CalendarEventDTO> = {
+          // Copiar solo las propiedades que existen en CalendarEventDTO
+          title: originalEvent.title,
+          description: originalEvent.description,
+          startDate: dropInfo.event.start.toISOString(),
+          endDate: dropInfo.event.end?.toISOString() || 
+                   new Date(dropInfo.event.start.getTime() + 
+                            (new Date(originalEvent.endDate).getTime() - new Date(originalEvent.startDate).getTime())
+                           ).toISOString(),
+          eventType: originalEvent.eventType,
+          employeeIds: originalEvent.employeeIds,
+          // NO incluir allDay ni color aquí
         };
         
-        this.eventService.updateEvent(eventId, eventRequest).subscribe({
+        this.calendarService.updateEvent(eventId, updatedEventData as CalendarEventDTO).subscribe({
           next: () => {
-            this.loadEvents(); // Reload events to ensure UI is consistent
+            this.loadEvents();
             this.showNotification('Event updated successfully', 'success');
           },
           error: (error) => {
@@ -326,26 +361,22 @@ export class CalendarComponent implements OnInit {
    */
   handleEventResize(resizeInfo: any): void {
     const eventId = parseInt(resizeInfo.event.id, 10);
-    const startDate = resizeInfo.event.start.toISOString();
-    const endDate = resizeInfo.event.end.toISOString();
     
-    this.eventService.getEventById(eventId).subscribe({
-      next: (event) => {
-        // Transform to EventRequest format
-        const eventRequest = {
-          title: event.title,
-          description: event.description,
-          startDate,
-          endDate,
-          eventType: event.eventType,
-          color: event.color,
-          allDay: event.allDay,
-          participantIds: event.participants.map(p => p.id)
+    this.calendarService.getEventById(eventId).subscribe({
+      next: (originalEvent: CalendarEventDTO) => { // originalEvent (DTO) no tiene allDay ni color
+        const updatedEventData: Partial<CalendarEventDTO> = {
+          title: originalEvent.title,
+          description: originalEvent.description,
+          startDate: resizeInfo.event.start.toISOString(),
+          endDate: resizeInfo.event.end.toISOString(),
+          eventType: originalEvent.eventType,
+          employeeIds: originalEvent.employeeIds,
+          // NO incluir allDay ni color aquí
         };
         
-        this.eventService.updateEvent(eventId, eventRequest).subscribe({
+        this.calendarService.updateEvent(eventId, updatedEventData as CalendarEventDTO).subscribe({
           next: () => {
-            this.loadEvents(); // Reload events to ensure UI is consistent
+            this.loadEvents();
             this.showNotification('Event updated successfully', 'success');
           },
           error: (error) => {
