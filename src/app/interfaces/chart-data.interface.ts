@@ -63,3 +63,12 @@ export interface GeneralAttendanceStats {
   totalAbsences: number;
   totalTardiness: number;
 }
+
+/**
+ * Interface para los datos de horas trabajadas
+ * devueltas por el endpoint de horas trabajadas
+ */
+export interface WorkedHoursResponse {
+  fullName: string;
+  workedHours: number;
+}

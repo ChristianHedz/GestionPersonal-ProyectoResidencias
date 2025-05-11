@@ -8,9 +8,12 @@ import { MatCardModule } from '@angular/material/card';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
+import { catchError, finalize } from 'rxjs/operators';
+import { of } from 'rxjs';
 import { ChartDataService } from '../../../../services/chart-data.service';
 import { ChartTypeOption, DateRange, EmployeeHoursData } from '../../../../interfaces/chart-data.interface';
 import { AverageHoursPipe, MaxHoursPipe, MinHoursPipe } from '../../pipes/hours-stats.pipe';
@@ -29,6 +32,7 @@ import { AverageHoursPipe, MaxHoursPipe, MinHoursPipe } from '../../pipes/hours-
     MatButtonToggleModule,
     MatDatepickerModule,
     MatNativeDateModule,
+    MatProgressSpinnerModule,
     AverageHoursPipe,
     MaxHoursPipe,
     MinHoursPipe,
@@ -49,6 +53,8 @@ export class HoursByEmployeeComponent implements OnInit {
   selectedDateRange = signal<DateRange>(this.getDefaultDateRange());
   selectedChartType = signal<ChartType>('bar');
   chartData = signal<EmployeeHoursData[]>([]);
+  isLoading = signal<boolean>(false);
+  error = signal<string | null>(null);
   
   // Available chart types
   chartTypes = signal<ChartTypeOption[]>([
@@ -181,8 +187,19 @@ export class HoursByEmployeeComponent implements OnInit {
 
   // Load data for the selected date range
   loadChartData(): void {
+    this.isLoading.set(true);
+    this.error.set(null);
+    
     this.chartDataService.getEmployeeHours(this.selectedDateRange())
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        catchError(err => {
+          console.error('Error loading worked hours data:', err);
+          this.error.set('Error al cargar los datos de horas trabajadas. Por favor, intente nuevamente.');
+          return of([]);
+        }),
+        finalize(() => this.isLoading.set(false))
+      )
       .subscribe(data => {
         this.chartData.set(data);
       });
