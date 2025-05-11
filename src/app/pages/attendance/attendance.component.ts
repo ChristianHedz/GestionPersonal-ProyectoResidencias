@@ -89,6 +89,7 @@ export class AttendanceComponent implements OnInit {
     { value: 'RETARDO', label: 'Retardos' }
   ];
 
+  
   filterForm = this.fb.group({
     attendanceIncidents: this.fb.nonNullable.control<AttendanceIncidents>('all'),
     employeeFilter: this.fb.nonNullable.control<string>('all'),

@@ -10,9 +10,10 @@ import {
   EmployeeVacationData,
   AvailableVacationsResponse,
   AttendanceStats,
-  GeneralAttendanceStats
+  GeneralAttendanceStats,
+  WorkedHoursResponse
 } from '../interfaces/chart-data.interface';
-import { environment } from '../../environments/environment';
+import { environment } from '../../env/enviroments';
 
 @Injectable({
   providedIn: 'root'
@@ -88,12 +89,27 @@ export class ChartDataService {
     );
   }
 
+  /**
+   * Gets employee worked hours from the backend API
+   * @param dateRange Optional date range to filter the data
+   * @returns Observable with employee hours data
+   */
   getEmployeeHours(dateRange?: DateRange): Observable<EmployeeHoursData[]> {
     const range = dateRange || this.getDefaultDateRange();
-    // In production: return this.http.get<EmployeeHoursData[]>(
-    //   `${this.baseUrl}/employees/hours?startDate=${range.startDate.toISOString()}&endDate=${range.endDate.toISOString()}`
-    // );
-    return of(this.mockEmployeeHoursData.filter(data => this.isDateInRange(data.date, range)));
+    const startDateFormatted = this.formatDate(range.startDate);
+    const endDateFormatted = this.formatDate(range.endDate);
+    
+    return this.http.get<WorkedHoursResponse[]>(
+      `http://localhost:8081/api/v1/charts/worked-hours?startDate=${startDateFormatted}&endDate=${endDateFormatted}`
+    )
+    .pipe(
+      map(response => response.map(item => ({
+        employeeId: 0, // Not available in the backend response
+        employeeName: item.fullName,
+        hoursWorked: item.workedHours,
+        date: range.endDate // We use the end date of the range as default
+      })))
+    );
   }
 
   /**

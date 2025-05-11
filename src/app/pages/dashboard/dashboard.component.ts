@@ -18,7 +18,6 @@ import { ToolbarComponent } from '../../shared/toolbar/toolbar.component';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ZXingScannerModule } from '@zxing/ngx-scanner';
 import { BarcodeFormat } from '@zxing/library';
-import { toSignal } from '@angular/core/rxjs-interop';
 import Swal from 'sweetalert2';
 import 'animate.css';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
