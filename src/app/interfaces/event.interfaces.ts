@@ -21,7 +21,6 @@ export interface Event {
   endDate: Date | string;
   eventType: EventType;
   color: string;
-  allDay: boolean;
   participants: EmployeeDTO[];
 }
 
@@ -35,7 +34,6 @@ export interface EventRequest {
   endDate: string;
   eventType: EventType;
   color: string;
-  allDay: boolean;
   participantIds: number[];
 }
 
@@ -47,7 +45,6 @@ export interface CalendarEvent {
   title: string;
   start: string;
   end: string;
-  allDay: boolean;
   backgroundColor: string;
   borderColor: string;
   description: string;

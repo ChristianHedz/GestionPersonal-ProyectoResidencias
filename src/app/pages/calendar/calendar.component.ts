@@ -49,6 +49,9 @@ export class CalendarComponent implements OnInit {
   calendarEvents = signal<CalendarEvent[]>([]);
   employees = signal<EmployeeDTO[]>([]);
 
+  // Color estándar para todos los eventos
+  defaultEventColor = '#3788d8';
+
   // Calendar configuration
   calendarOptions = {
     plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
@@ -58,6 +61,7 @@ export class CalendarComponent implements OnInit {
     selectable: true,
     selectMirror: true,
     dayMaxEvents: true,
+    timeZone: 'local',
     themeSystem: 'standard',
     headerToolbar: {
       left: 'prev,next today',
@@ -65,6 +69,11 @@ export class CalendarComponent implements OnInit {
       right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
     },
     events: [] as CalendarEvent[],
+    displayEventTime: false,
+    eventContent: function(arg: any) {
+      return { html: `<div class="fc-event-title">${arg.event.title}</div>` };
+    },
+    eventClassNames: 'solid-event', // Clase para eventos sólidos
     // Calendar callbacks
     select: this.handleDateSelect.bind(this),
     eventClick: this.handleEventClick.bind(this),
@@ -75,6 +84,56 @@ export class CalendarComponent implements OnInit {
   ngOnInit(): void {
     this.loadEvents();
     this.loadEmployees();
+    
+    // Añadir estilos para asegurar que los eventos tengan fondo sólido
+    this.addCalendarStyles();
+  }
+
+  /**
+   * Añade estilos CSS para asegurar eventos con fondo sólido
+   */
+  addCalendarStyles(): void {
+    const style = document.createElement('style');
+    style.innerHTML = `
+      .solid-event {
+        opacity: 1 !important;
+        background-color: ${this.defaultEventColor} !important;
+        border-color: ${this.defaultEventColor} !important;
+      }
+      .fc-event, .fc-event-draggable, .fc-event-resizable {
+        background-color: ${this.defaultEventColor} !important;
+        border-color: ${this.defaultEventColor} !important;
+        opacity: 1 !important;
+      }
+      .fc-daygrid-event {
+        background-color: ${this.defaultEventColor} !important;
+        border-color: ${this.defaultEventColor} !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  /**
+   * Ajusta las fechas de inicio y fin para eventos consecutivos
+   * Si las fechas son consecutivas (ej: 1 al 2 de mayo), ajusta para mostrar en un solo cuadro
+   */
+  adjustConsecutiveDates(startDate: string, endDate: string): { startDate: string, endDate: string } {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    
+    // Verificar si las fechas son consecutivas (1 día de diferencia)
+    const diffTime = Math.abs(end.getTime() - start.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 1) {
+      // Si son fechas consecutivas, usar la misma fecha para mantener en un solo cuadro
+      return {
+        startDate,
+        endDate: startDate
+      };
+    }
+    
+    return { startDate, endDate };
   }
 
   /**
@@ -91,7 +150,7 @@ export class CalendarComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading events:', error);
-        this.showNotification('Error loading events', 'error');
+        this.showNotification('Error cargando eventos', 'error');
         this.isLoading.set(false);
       }
     });
@@ -107,7 +166,7 @@ export class CalendarComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading employees:', error);
-        this.showNotification('Error loading employees', 'error');
+        this.showNotification('Error cargando empleados', 'error');
       }
     });
   }
@@ -123,30 +182,20 @@ export class CalendarComponent implements OnInit {
             .filter((emp): emp is EmployeeDTO => emp !== undefined)
         : [];
       
-      // Intentar inferir allDay si las fechas son a medianoche y abarcan un día completo.
-      // FullCalendar también tiene su propia lógica para esto si solo se proporcionan fechas.
-      const start = new Date(event.startDate);
-      const end = new Date(event.endDate);
-      const isMidnightStart = start.getHours() === 0 && start.getMinutes() === 0 && start.getSeconds() === 0;
-      const isMidnightEnd = end.getHours() === 0 && end.getMinutes() === 0 && end.getSeconds() === 0;
-      let inferredAllDay = false;
-      if (isMidnightStart && isMidnightEnd && (end.getTime() - start.getTime()) % (24 * 60 * 60 * 1000) === 0 && (end.getTime() - start.getTime()) >= (24 * 60 * 60 * 1000)) {
-        inferredAllDay = true;
-      } else if (isMidnightStart && event.endDate === event.startDate) { // Evento de un solo día sin hora específica
-        inferredAllDay = true;
-      }
-
+      // Ajustar fechas consecutivas para mostrar en un solo cuadro
+      const adjustedDates = this.adjustConsecutiveDates(event.startDate, event.endDate);
+      
       return {
         id: event.id!.toString(),
         title: event.title,
-        start: event.startDate,
-        end: event.endDate,
-        allDay: inferredAllDay, // Usar el allDay inferido o el que FullCalendar determine
-        backgroundColor: '#3788d8', // Color por defecto para eventos del backend
-        borderColor: '#3788d8',   // Color por defecto
+        start: adjustedDates.startDate,
+        end: adjustedDates.endDate,
+        backgroundColor: this.defaultEventColor,
+        borderColor: this.defaultEventColor,
         description: event.description || '',
         eventType: event.eventType,
-        participants: participants
+        participants: participants,
+        className: 'solid-event' // Añadir clase para estilo sólido
       };
     });
   }
@@ -158,7 +207,12 @@ export class CalendarComponent implements OnInit {
     const calendarApi = this.calendarComponent?.getApi();
     if (calendarApi) {
       calendarApi.removeAllEvents();
-      events.forEach(event => calendarApi.addEvent(event));
+      events.forEach(event => {
+        calendarApi.addEvent({
+          ...event,
+          display: 'block' // Forzar visualización como bloque
+        });
+      });
     } else {
       this.calendarOptions = {
         ...this.calendarOptions,
@@ -177,7 +231,6 @@ export class CalendarComponent implements OnInit {
     this.handleDateSelect({
       startStr: now.toISOString(),
       endStr: later.toISOString(),
-      allDay: false,
       view: { 
         calendar: this.calendarComponent?.getApi() 
       }
@@ -194,34 +247,33 @@ export class CalendarComponent implements OnInit {
         mode: 'create',
         start: selectInfo.startStr,
         end: selectInfo.endStr,
-        allDay: selectInfo.allDay, // El diálogo aún puede usarlo para la UI inicial
         employees: this.employees()
       }
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log('Resultado del diálogo:', result);
       if (result) {
-        // Construir el DTO explícitamente para asegurar que todos los campos necesarios,
-        // incluyendo employeeIds, se tomen del resultado del diálogo.
-        // Se asume que 'result' contiene: title, description, startDate, endDate, eventType, y employeeIds.
+        // Ajustar fechas para eventos consecutivos
+        const adjustedDates = this.adjustConsecutiveDates(result.startDate, result.endDate);
+        
         const dtoToSend: CalendarEventDTO = {
           title: result.title,
           description: result.description,
           startDate: result.startDate,
           endDate: result.endDate,
           eventType: result.eventType,
-          employeeIds: result.participantIds || [] // Tomar employeeIds del resultado; si no existe, usar un array vacío.
+          employeeIds: result.participantIds || []
         };
 
         this.calendarService.createEvent(dtoToSend).subscribe({
-          next: () => {
+          next: (response) => {
+            // Refrescar todos los eventos para asegurar consistencia visual
             this.loadEvents();
-            this.showNotification('Event created successfully', 'success');
+            this.showNotification('Evento creado exitosamente', 'success');
           },
           error: (error) => {
             console.error('Error creating event:', error);
-            this.showNotification('Error creating event', 'error');
+            this.showNotification('Error creando evento', 'error');
           }
         });
       }
@@ -239,17 +291,14 @@ export class CalendarComponent implements OnInit {
     const eventId = parseInt(clickInfo.event.id, 10);
     
     this.calendarService.getEventById(eventId).subscribe({
-      next: (event: CalendarEventDTO) => { // event (DTO) no tendrá allDay ni color
+      next: (event: CalendarEventDTO) => {
         const dialogRef = this.dialog.open(EventDialogComponent, {
           width: '600px',
           data: {
             mode: 'edit',
             event: {
-              ...event, // DTO del backend
-              // El diálogo puede necesitar valores por defecto para allDay/color para el formulario si los usa
-              // Aquí podrías pasar el allDay/color del evento de FullCalendar si fuera necesario para la UI del diálogo
-              allDay: clickInfo.event.allDay, // Pasar el allDay del evento de FullCalendar
-              color: clickInfo.event.backgroundColor // Pasar el color del evento de FullCalendar
+              ...event,
+              color: this.defaultEventColor
             },
             employees: this.employees()
           }
@@ -261,15 +310,16 @@ export class CalendarComponent implements OnInit {
           if (dialogResult === 'delete') {
             this.deleteEvent(eventId);
           } else {
-            // Construir el DTO explícitamente.
-            // Se asume que 'dialogResult' contiene: title, description, startDate, endDate, eventType, y employeeIds.
+            // Ajustar fechas para eventos consecutivos
+            const adjustedDates = this.adjustConsecutiveDates(dialogResult.startDate, dialogResult.endDate);
+            
             const dtoToSend: CalendarEventDTO = {
               title: dialogResult.title,
               description: dialogResult.description,
               startDate: dialogResult.startDate,
               endDate: dialogResult.endDate,
               eventType: dialogResult.eventType,
-              employeeIds: dialogResult.employeeIds || [] // Tomar employeeIds del resultado; si no existe, usar un array vacío.
+              employeeIds: dialogResult.participantIds || []
             };
             this.updateEvent(eventId, dtoToSend);
           }
@@ -277,7 +327,7 @@ export class CalendarComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading event details:', error);
-        this.showNotification('Error loading event details', 'error');
+        this.showNotification('Error cargando detalles del evento', 'error');
       }
     });
   }
@@ -285,15 +335,15 @@ export class CalendarComponent implements OnInit {
   /**
    * Updates an event
    */
-  updateEvent(eventId: number, eventData: CalendarEventDTO): void { // eventData ya no debería tener allDay/color
+  updateEvent(eventId: number, eventData: CalendarEventDTO): void {
     this.calendarService.updateEvent(eventId, eventData).subscribe({
       next: () => {
         this.loadEvents();
-        this.showNotification('Event updated successfully', 'success');
+        this.showNotification('Evento actualizado exitosamente', 'success');
       },
       error: (error) => {
         console.error('Error updating event:', error);
-        this.showNotification('Error updating event', 'error');
+        this.showNotification('Error actualizando evento', 'error');
       }
     });
   }
@@ -305,11 +355,11 @@ export class CalendarComponent implements OnInit {
     this.calendarService.deleteEvent(eventId).subscribe({
       next: () => {
         this.loadEvents();
-        this.showNotification('Event deleted successfully', 'success');
+        this.showNotification('Evento eliminado exitosamente', 'success');
       },
       error: (error) => {
         console.error('Error deleting event:', error);
-        this.showNotification('Error deleting event', 'error');
+        this.showNotification('Error eliminando evento', 'error');
       }
     });
   }
@@ -321,37 +371,46 @@ export class CalendarComponent implements OnInit {
     const eventId = parseInt(dropInfo.event.id, 10);
     
     this.calendarService.getEventById(eventId).subscribe({
-      next: (originalEvent: CalendarEventDTO) => { // originalEvent (DTO) no tiene allDay ni color
+      next: (originalEvent: CalendarEventDTO) => {
+        // Calcular la duración original del evento
+        const originalStart = new Date(originalEvent.startDate);
+        const originalEnd = new Date(originalEvent.endDate);
+        const duration = originalEnd.getTime() - originalStart.getTime();
+        
+        // Aplicar la misma duración al nuevo evento con la fecha de inicio actualizada
+        const newStartDate = dropInfo.event.start.toISOString();
+        const newEndDate = dropInfo.event.end ? 
+          dropInfo.event.end.toISOString() : 
+          new Date(dropInfo.event.start.getTime() + duration).toISOString();
+        
+        // Ajustar fechas para eventos consecutivos
+        const adjustedDates = this.adjustConsecutiveDates(newStartDate, newEndDate);
+        
         const updatedEventData: Partial<CalendarEventDTO> = {
-          // Copiar solo las propiedades que existen en CalendarEventDTO
           title: originalEvent.title,
           description: originalEvent.description,
-          startDate: dropInfo.event.start.toISOString(),
-          endDate: dropInfo.event.end?.toISOString() || 
-                   new Date(dropInfo.event.start.getTime() + 
-                            (new Date(originalEvent.endDate).getTime() - new Date(originalEvent.startDate).getTime())
-                           ).toISOString(),
+          startDate: newStartDate,
+          endDate: newEndDate,
           eventType: originalEvent.eventType,
           employeeIds: originalEvent.employeeIds,
-          // NO incluir allDay ni color aquí
         };
         
         this.calendarService.updateEvent(eventId, updatedEventData as CalendarEventDTO).subscribe({
           next: () => {
             this.loadEvents();
-            this.showNotification('Event updated successfully', 'success');
+            this.showNotification('Evento actualizado exitosamente', 'success');
           },
           error: (error) => {
             dropInfo.revert();
             console.error('Error updating event:', error);
-            this.showNotification('Error updating event', 'error');
+            this.showNotification('Error actualizando evento', 'error');
           }
         });
       },
       error: (error) => {
         dropInfo.revert();
         console.error('Error loading event details:', error);
-        this.showNotification('Error loading event details', 'error');
+        this.showNotification('Error cargando detalles del evento', 'error');
       }
     });
   }
@@ -363,33 +422,38 @@ export class CalendarComponent implements OnInit {
     const eventId = parseInt(resizeInfo.event.id, 10);
     
     this.calendarService.getEventById(eventId).subscribe({
-      next: (originalEvent: CalendarEventDTO) => { // originalEvent (DTO) no tiene allDay ni color
+      next: (originalEvent: CalendarEventDTO) => {
+        const newStartDate = resizeInfo.event.start.toISOString();
+        const newEndDate = resizeInfo.event.end.toISOString();
+        
+        // Ajustar fechas para eventos consecutivos
+        const adjustedDates = this.adjustConsecutiveDates(newStartDate, newEndDate);
+        
         const updatedEventData: Partial<CalendarEventDTO> = {
           title: originalEvent.title,
           description: originalEvent.description,
-          startDate: resizeInfo.event.start.toISOString(),
-          endDate: resizeInfo.event.end.toISOString(),
+          startDate: newStartDate,
+          endDate: newEndDate,
           eventType: originalEvent.eventType,
           employeeIds: originalEvent.employeeIds,
-          // NO incluir allDay ni color aquí
         };
         
         this.calendarService.updateEvent(eventId, updatedEventData as CalendarEventDTO).subscribe({
           next: () => {
             this.loadEvents();
-            this.showNotification('Event updated successfully', 'success');
+            this.showNotification('Evento actualizado exitosamente', 'success');
           },
           error: (error) => {
             resizeInfo.revert();
             console.error('Error updating event:', error);
-            this.showNotification('Error updating event', 'error');
+            this.showNotification('Error actualizando evento', 'error');
           }
         });
       },
       error: (error) => {
         resizeInfo.revert();
         console.error('Error loading event details:', error);
-        this.showNotification('Error loading event details', 'error');
+        this.showNotification('Error cargando detalles del evento', 'error');
       }
     });
   }
@@ -398,7 +462,7 @@ export class CalendarComponent implements OnInit {
    * Shows a notification snackbar
    */
   showNotification(message: string, type: 'success' | 'error'): void {
-    this.snackBar.open(message, 'Close', {
+    this.snackBar.open(message, 'Cerrar', {
       duration: 3000,
       horizontalPosition: 'end',
       verticalPosition: 'top',

@@ -65,7 +65,6 @@ export class EventDialogComponent implements OnInit {
       event?: any;
       start?: string;
       end?: string;
-      allDay?: boolean;
       employees: EmployeeDTO[];
     }
   ) {}
@@ -89,30 +88,9 @@ export class EventDialogComponent implements OnInit {
       description: [''],
       startDate: [startDate, [Validators.required]],
       endDate: [endDate, [Validators.required]],
-      allDay: [this.data.allDay || false],
       eventType: [EventType.MEETING, [Validators.required]],
       color: ['#2196f3', [Validators.required]],
       participantIds: [[]]
-    });
-
-    // When allDay changes, adjust the time of the dates
-    this.eventForm.get('allDay')?.valueChanges.subscribe(isAllDay => {
-      if (isAllDay) {
-        const startDate = this.eventForm.get('startDate')?.value;
-        const endDate = this.eventForm.get('endDate')?.value;
-        
-        if (startDate) {
-          const newStartDate = new Date(startDate);
-          newStartDate.setHours(0, 0, 0, 0);
-          this.eventForm.get('startDate')?.setValue(newStartDate);
-        }
-        
-        if (endDate) {
-          const newEndDate = new Date(endDate);
-          newEndDate.setHours(23, 59, 59, 999);
-          this.eventForm.get('endDate')?.setValue(newEndDate);
-        }
-      }
     });
   }
 
@@ -127,9 +105,8 @@ export class EventDialogComponent implements OnInit {
       description: event.description,
       startDate: new Date(event.startDate),
       endDate: new Date(event.endDate),
-      allDay: event.allDay,
       eventType: event.eventType,
-      color: event.color,
+      color: event.color || '#2196f3',
       participantIds
     });
   }
@@ -164,7 +141,7 @@ export class EventDialogComponent implements OnInit {
   }
 
   onDelete(): void {
-    if (confirm('Are you sure you want to delete this event?')) {
+    if (confirm('¿Está seguro de que desea eliminar este evento?')) {
       this.dialogRef.close('delete');
     }
   }
