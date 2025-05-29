@@ -7,6 +7,15 @@
   background-color: transparent !important;
 }
 
+/* Botón responsivo */
+.responsive-btn-container {
+  flex-wrap: wrap;
+}
+
+.add-event-btn .btn-text {
+  margin-left: 0.5rem;
+}
+
 .calendar-wrapper {
   height: calc(100vh - 200px);
   position: relative;
@@ -63,4 +72,156 @@
   border: none !important;
   border-radius: 4px !important;
   padding: 2px 4px !important;
+}
+
+/* Hacer visible el texto de los días y números */
+::ng-deep .fc-col-header-cell,
+::ng-deep .fc-col-header-cell-cushion {
+  color: #000 !important;
+  font-weight: 500 !important;
+}
+
+::ng-deep .fc-daygrid-day-number {
+  font-weight: 500 !important;
+}
+
+::ng-deep .fc-day-today .fc-daygrid-day-number {
+  color: #1976d2 !important;
+  font-weight: 600 !important;
+}
+
+/* Estilos responsivos para FullCalendar */
+@media (max-width: 768px) {
+  .calendar-wrapper {
+    height: calc(100vh - 250px);
+  }
+
+  /* Ajustar header toolbar para móviles */
+  ::ng-deep .fc-toolbar {
+    flex-wrap: wrap !important;
+    gap: 0.5rem !important;
+    justify-content: center !important;
+  }
+
+  ::ng-deep .fc-toolbar-chunk {
+    display: flex !important;
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+    gap: 0.25rem !important;
+  }
+
+  ::ng-deep .fc-toolbar-title {
+    font-size: 1.1rem !important;
+    margin: 0.25rem 0 !important;
+    flex: 1 1 auto !important;
+    text-align: center !important;
+    min-width: 0 !important;
+  }
+
+  /* Botones más pequeños en móvil */
+  ::ng-deep .fc-button {
+    padding: 0.2rem 0.4rem !important;
+    font-size: 0.8rem !important;
+  }
+
+  /* Ajustar tamaño de botones pero mantenerlos visibles si hay espacio */
+  ::ng-deep .fc-button-group {
+    gap: 2px !important;
+  }
+
+  /* Ajustar días de la semana */
+  ::ng-deep .fc-col-header-cell {
+    font-size: 0.8rem !important;
+    padding: 0.25rem !important;
+  }
+
+  /* Ajustar celdas de días */
+  ::ng-deep .fc-daygrid-day-number {
+    font-size: 0.9rem !important;
+    padding: 0.25rem !important;
+  }
+
+  /* Eventos más compactos en móvil */
+  ::ng-deep .fc-event {
+    font-size: 0.75rem !important;
+    padding: 1px 2px !important;
+  }
+
+  /* Ajustar contenido de eventos */
+  ::ng-deep .fc-event-title {
+    font-size: 0.75rem !important;
+    line-height: 1.2 !important;
+  }
+
+  /* Popup para eventos adicionales */
+  ::ng-deep .fc-more-popover {
+    max-width: 90vw !important;
+  }
+
+  /* Botón de agregar evento responsivo */
+  .responsive-btn-container {
+    justify-content: center !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .calendar-wrapper {
+    height: calc(100vh - 280px);
+  }
+
+  /* Header aún más compacto */
+  ::ng-deep .fc-toolbar-title {
+    font-size: 1rem !important;
+  }
+
+  /* Solo mostrar botones esenciales en pantallas muy pequeñas */
+  ::ng-deep .fc-timeGridWeek-button {
+    display: none !important;
+  }
+
+  /* Comprimir más los grupos de botones */
+  ::ng-deep .fc-button-group {
+    gap: 1px !important;
+  }
+
+  ::ng-deep .fc-toolbar-chunk {
+    gap: 0.15rem !important;
+  }
+
+  /* Eventos muy compactos */
+  ::ng-deep .fc-event {
+    font-size: 0.7rem !important;
+    padding: 1px !important;
+  }
+
+  /* Días de semana abreviados */
+  ::ng-deep .fc-col-header-cell {
+    font-size: 0.7rem !important;
+  }
+
+  /* Números de día más pequeños */
+  ::ng-deep .fc-daygrid-day-number {
+    font-size: 0.8rem !important;
+  }
+
+  .add-event-btn {
+    min-width: auto !important;
+    padding: 0.5rem !important;
+  }
+}
+
+/* Mejoras para tablet */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .calendar-wrapper {
+    height: calc(100vh - 220px);
+  }
+
+  ::ng-deep .fc-toolbar-title {
+    font-size: 1.3rem !important;
+  }
+
+  ::ng-deep .fc-button {
+    padding: 0.3rem 0.6rem !important;
+    font-size: 0.9rem !important;
+  }
 }

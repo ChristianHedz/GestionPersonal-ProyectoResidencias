@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 import { CalendarEventDTO } from '../models/calendar-event.dto';
 import { environment } from '../../../env/enviroments';
@@ -65,5 +65,43 @@ export class CalendarService {
    */
   deleteEvent(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
+
+  /**
+   * Obtiene todos los eventos de un empleado específico.
+   * @param employeeId El ID del empleado.
+   * @returns Un Observable con un array de eventos del empleado.
+   */
+  getEventsByEmployeeId(employeeId: number): Observable<CalendarEventDTO[]> {
+    return this.http.get<CalendarEventDTO[]>(`${this.baseUrl}/employee/${employeeId}`);
+  }
+
+  /**
+   * Obtiene eventos por rango de fechas.
+   * @param startDate Fecha de inicio en formato ISO.
+   * @param endDate Fecha de fin en formato ISO.
+   * @returns Un Observable con un array de eventos en el rango especificado.
+   */
+  getEventsByDateRange(startDate: string, endDate: string): Observable<CalendarEventDTO[]> {
+    const params = new HttpParams()
+      .set('startDate', startDate)
+      .set('endDate', endDate);
+    
+    return this.http.get<CalendarEventDTO[]>(`${this.baseUrl}/date-range`, { params });
+  }
+
+  /**
+   * Obtiene eventos de un empleado específico por rango de fechas.
+   * @param employeeId El ID del empleado.
+   * @param startDate Fecha de inicio en formato ISO.
+   * @param endDate Fecha de fin en formato ISO.
+   * @returns Un Observable con un array de eventos del empleado en el rango especificado.
+   */
+  getEventsByEmployeeIdAndDateRange(employeeId: number, startDate: string, endDate: string): Observable<CalendarEventDTO[]> {
+    const params = new HttpParams()
+      .set('startDate', startDate)
+      .set('endDate', endDate);
+    
+    return this.http.get<CalendarEventDTO[]>(`${this.baseUrl}/employee/${employeeId}/date-range`, { params });
   }
 }

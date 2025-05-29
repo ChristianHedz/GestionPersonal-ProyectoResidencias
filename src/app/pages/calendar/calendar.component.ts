@@ -63,11 +63,33 @@ export class CalendarComponent implements OnInit {
     dayMaxEvents: true,
     timeZone: 'local',
     themeSystem: 'standard',
+    height: 'auto',
+    contentHeight: 'auto',
+    aspectRatio: 1.8,
+    // Configuración responsiva de headerToolbar
     headerToolbar: {
-      left: 'prev,next today',
+      left: 'prev,next',
       center: 'title',
-      right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+      right: 'today dayGridMonth,timeGridWeek'
     },
+    // Configuración responsiva para pantallas pequeñas
+    views: {
+      dayGridMonth: {
+        dayMaxEvents: 2,
+        moreLinkClick: 'popover'
+      },
+      timeGridWeek: {
+        dayHeaderFormat: { weekday: 'short' as const }
+      },
+      timeGridDay: {
+        dayHeaderFormat: { weekday: 'long' as const, month: 'short' as const, day: 'numeric' as const }
+      },
+      listWeek: {
+        dayHeaderFormat: { weekday: 'long' as const }
+      }
+    },
+    // Configuración responsiva automática
+    windowResizeDelay: 100,
     events: [] as CalendarEvent[],
     displayEventTime: false,
     eventContent: function(arg: any) {

@@ -6,10 +6,10 @@
       <mat-card-subtitle>Manejar eventos, vacaciones, dias festivos entre otros</mat-card-subtitle>
     </mat-card-header>
     <mat-card-content class="p-0 m-3">
-      <div class="flex justify-content-end mb-3">
-        <button mat-raised-button color="primary" (click)="createNewEvent()">
+      <div class="flex justify-content-end mb-3 responsive-btn-container">
+        <button mat-raised-button color="primary" (click)="createNewEvent()" class="add-event-btn">
           <mat-icon>add</mat-icon>
-          Agregar Evento
+          <span class="btn-text">Agregar Evento</span>
         </button>
       </div>
 
