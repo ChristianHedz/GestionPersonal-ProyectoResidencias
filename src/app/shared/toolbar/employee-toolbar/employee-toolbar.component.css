@@ -1,0 +1,37 @@
+.toolbar-gradient {
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    background-color: rgba(17, 25, 40, 0.25);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.125);  
+    filter: drop-shadow(0 30px 10px rgba(0,0,0,0.125));
+    position: relative;
+    z-index: 10;
+  }
+
+  ::ng-deep .mat-mdc-menu-panel, 
+  ::ng-deep .mat-mdc-menu-content {
+    background-color: #1A0F2B !important;
+    border-radius: 8px;
+  }
+  
+  ::ng-deep .mat-mdc-menu-item .mat-mdc-menu-item-text {
+    color: #fff !important;
+  }
+  
+  ::ng-deep .mat-mdc-menu-item .mat-icon {
+    background: linear-gradient(90deg, #8d31f7, #e27aff, #29ffbf) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    color: transparent !important;
+    display: inline-block;
+  }
+  
+  ::ng-deep .mat-mdc-menu-item:hover:not([disabled]) {
+    background-color: #2A1F3D !important;
+    border-radius: 4px;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: none;
+    filter: none;
+  }

@@ -1,0 +1,24 @@
+<mat-toolbar class="flex justify-content-between zindex toolbar-gradient">
+    <div class="flex align-items-center">
+      <button mat-icon-button [matMenuTriggerFor]="menu">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <mat-menu #menu="matMenu">
+        <button mat-menu-item routerLink="/employee/profile">
+          <mat-icon >home</mat-icon>
+          <span>Inicio</span>
+        </button>
+        <button mat-menu-item routerLink="/employee/calendar">
+          <mat-icon >calendar_month</mat-icon>
+          <span>Mis Eventos</span>
+        </button>
+        <button mat-menu-item>
+          <mat-icon>settings</mat-icon>
+          <span>Configuración</span>
+        </button>
+      </mat-menu>
+    </div>
+    <button mat-button (click)="logout()">
+      Cerrar Sesión
+    </button>
+  </mat-toolbar>
