@@ -1,0 +1,517 @@
+.surface-ground::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+      linear-gradient(90deg, transparent 98%, rgba(66, 135, 245, 0.15) 98%),
+      linear-gradient(0deg, transparent 98%, rgba(66, 135, 245, 0.15) 98%);
+    background-size: 40px 40px;
+    z-index: -1;
+  }
+
+  .mt-text-0{
+    margin-top: 0;
+  }
+
+  .custom-pointer:hover {
+    cursor: pointer;
+  }
+
+  /* 3D user avatar styling */
+  .avatar-3d-container {
+    width: 100%;
+    height: 100%;
+    perspective: 1000px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .avatar-3d {
+    width: 12rem;
+    height: 12rem;
+    position: relative;
+    transform-style: preserve-3d;
+    animation: rotateAvatar 12s infinite linear;
+  }
+
+  .avatar-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    border: 2px solid #4287f5;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+    color: #4287f5;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+  
+  .avatar-face.front { transform: translateZ(6rem); }
+  .avatar-face.back { transform: rotateY(180deg) translateZ(6rem); }
+  .avatar-face.right { transform: rotateY(90deg) translateZ(6rem); }
+  .avatar-face.left { transform: rotateY(-90deg) translateZ(6rem); }
+  .avatar-face.top { transform: rotateX(90deg) translateZ(6rem); }
+  .avatar-face.bottom { transform: rotateX(-90deg) translateZ(6rem); }
+
+  @keyframes rotateAvatar {
+    0% { transform: rotateX(0deg) rotateY(0deg); }
+    100% { transform: rotateX(360deg) rotateY(360deg); }
+  }
+
+  /* Contenedor principal - estilo similar al calendar */
+  .calendar-container {
+    height: 100%;
+    width: 100%;
+  }
+
+  /* Clase de transparencia como en calendar component */
+  .trans {
+    background-color: transparent !important;
+  }
+
+  /* Header del empleado */
+  .employee-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+  }
+
+  .avatar-icon {
+    font-size: 3rem;
+    height: 3rem;
+    width: 3rem;
+    color: #650c88;
+  }
+
+  .employee-name {
+    color: #650c88;
+    font-weight: 600;
+  }
+
+  .employee-email {
+    color: #666;
+    font-size: 0.9rem;
+  }
+
+  /* Calendario wrapper */
+  .calendar-wrapper {
+    height: calc(100vh - 300px);
+    position: relative;
+  }
+
+  .calendar-info {
+    color: #666;
+    font-size: 0.9rem;
+  }
+
+  /* Mensaje cuando no hay eventos */
+  .no-events-message {
+    background: rgba(46, 125, 50, 0.05);
+    border-radius: 8px;
+    margin-top: 1rem;
+  }
+
+  .large-icon {
+    font-size: 4rem !important;
+    height: 4rem !important;
+    width: 4rem !important;
+    opacity: 0.3;
+  }
+
+  /* Estilos específicos para FullCalendar - aplicando transparencia como en calendar */
+  ::ng-deep .fc .fc-toolbar-title {
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: #650c88 !important;
+  }
+
+  ::ng-deep .fc-event {
+    cursor: pointer;
+  }
+
+  ::ng-deep .fc-event:hover {
+    filter: brightness(90%);
+  }
+
+  ::ng-deep .error-snackbar {
+    background-color: #f44336;
+    color: white;
+  }
+
+  ::ng-deep .success-snackbar {
+    background-color: #650c88;
+    color: white;
+  }
+
+  ::ng-deep .info-snackbar {
+    background-color: #2196f3;
+    color: white;
+  }
+
+  /* Aplicar transparencia a todos los elementos del calendario (igual que en calendar component) */
+  ::ng-deep .fc,
+  ::ng-deep .fc-view,
+  ::ng-deep .fc-view-harness,
+  ::ng-deep .fc-scrollgrid,
+  ::ng-deep .fc-scrollgrid-section,
+  ::ng-deep .fc-scrollgrid-section-body,
+  ::ng-deep .fc-scrollgrid-section-footer,
+  ::ng-deep .fc-scrollgrid-section-header,
+  ::ng-deep .fc-scrollgrid-sync-table,
+  ::ng-deep .fc-daygrid,
+  ::ng-deep .fc-daygrid-body,
+  ::ng-deep .fc-daygrid-bg,
+  ::ng-deep .fc-daygrid-day,
+  ::ng-deep .fc-daygrid-day-frame,
+  ::ng-deep .fc-daygrid-day-bg,
+  ::ng-deep .fc-day-today,
+  ::ng-deep .fc-day-past,
+  ::ng-deep .fc-day-future {
+    background-color: transparent !important;
+    background: transparent !important;
+  }
+
+  /* Estilos específicos para eventos del empleado */
+  ::ng-deep .employee-event {
+    background-color: #650c88 !important;
+    border-color: #650c88 !important;
+    opacity: 1 !important;
+    border-radius: 4px !important;
+    font-weight: 500;
+    border: none !important;
+    padding: 2px 4px !important;
+  }
+
+  ::ng-deep .fc-event.employee-event:hover {
+    background-color: #650c88 !important;
+    border-color: #650c88 !important;
+    cursor: pointer !important;
+  }
+
+  ::ng-deep .fc-button-primary {
+    background-color: #650c88 !important;
+    border-color: #650c88 !important;
+  }
+
+  ::ng-deep .fc-button-primary:hover {
+    background-color: #650c88 !important;
+    border-color: #650c88 !important;
+  }
+
+  ::ng-deep .fc-button-primary:focus {
+    box-shadow: 0 0 0 0.2rem rgba(46, 125, 50, 0.25) !important;
+  }
+
+  ::ng-deep .fc-button-active {
+    background-color: #650c88 !important;
+    border-color: #650c88 !important;
+  }
+
+  /* Hacer visible el texto de los días y números */
+  ::ng-deep .fc-col-header-cell,
+  ::ng-deep .fc-col-header-cell-cushion {
+    color: #000 !important;
+    font-weight: 500 !important;
+  }
+
+  ::ng-deep .fc-daygrid-day-number {
+    font-weight: 500 !important;
+  }
+
+  ::ng-deep .fc-day-today .fc-daygrid-day-number {
+    color: #650c88 !important;
+    font-weight: 600 !important;
+  }
+
+  /* Responsive */
+  .responsive-controls {
+    flex-wrap: wrap;
+  }
+
+  .refresh-btn .btn-text {
+    margin-left: 0.5rem;
+  }
+
+  @media (max-width: 768px) {
+    .calendar-wrapper {
+      height: calc(100vh - 250px);
+    }
+    
+    .responsive-controls {
+      flex-direction: column;
+      gap: 1rem;
+      align-items: stretch !important;
+    }
+    
+    .calendar-info {
+      text-align: center;
+      order: 2;
+    }
+
+    .refresh-btn {
+      order: 1;
+      align-self: center;
+    }
+
+    /* Ajustar header del empleado en móvil */
+    .employee-avatar .avatar-icon {
+      font-size: 2rem !important;
+      height: 2rem !important;
+      width: 2rem !important;
+    }
+
+    .employee-name {
+      font-size: 1.1rem !important;
+    }
+
+    .employee-email {
+      font-size: 0.8rem !important;
+    }
+
+    /* Ajustar header toolbar para móviles */
+    ::ng-deep .fc-toolbar {
+      flex-wrap: wrap !important;
+      gap: 0.5rem !important;
+      justify-content: center !important;
+    }
+
+    ::ng-deep .fc-toolbar-chunk {
+      display: flex !important;
+      justify-content: center !important;
+      flex-wrap: wrap !important;
+      gap: 0.25rem !important;
+    }
+
+    ::ng-deep .fc-toolbar-title {
+      font-size: 1.1rem !important;
+      margin: 0.25rem 0 !important;
+      flex: 1 1 auto !important;
+      text-align: center !important;
+      min-width: 0 !important;
+    }
+
+    /* Botones más pequeños en móvil */
+    ::ng-deep .fc-button {
+      padding: 0.2rem 0.4rem !important;
+      font-size: 0.8rem !important;
+    }
+
+    /* Ajustar tamaño de botones pero mantenerlos visibles si hay espacio */
+    ::ng-deep .fc-button-group {
+      gap: 2px !important;
+    }
+
+    /* Ajustar días de la semana */
+    ::ng-deep .fc-col-header-cell {
+      font-size: 0.8rem !important;
+      padding: 0.25rem !important;
+    }
+
+    /* Ajustar celdas de días */
+    ::ng-deep .fc-daygrid-day-number {
+      font-size: 0.9rem !important;
+      padding: 0.25rem !important;
+    }
+
+    /* Eventos más compactos en móvil */
+    ::ng-deep .fc-event.employee-event {
+      font-size: 0.75rem !important;
+      padding: 1px 2px !important;
+    }
+
+    /* Ajustar contenido de eventos */
+    ::ng-deep .fc-event-title {
+      font-size: 0.75rem !important;
+      line-height: 1.2 !important;
+    }
+
+    /* Popup para eventos adicionales */
+    ::ng-deep .fc-more-popover {
+      max-width: 90vw !important;
+    }
+
+    /* Botón de actualizar más pequeño */
+    .calendar-info {
+      font-size: 0.8rem !important;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .calendar-wrapper {
+      height: calc(100vh - 280px);
+    }
+
+    /* Header aún más compacto */
+    ::ng-deep .fc-toolbar-title {
+      font-size: 1rem !important;
+    }
+
+    /* Solo mostrar botones esenciales en pantallas muy pequeñas */
+    ::ng-deep .fc-timeGridWeek-button {
+      display: none !important;
+    }
+
+    /* Comprimir más los grupos de botones */
+    ::ng-deep .fc-button-group {
+      gap: 1px !important;
+    }
+
+    ::ng-deep .fc-toolbar-chunk {
+      gap: 0.15rem !important;
+    }
+
+    /* Eventos muy compactos */
+    ::ng-deep .fc-event.employee-event {
+      font-size: 0.7rem !important;
+      padding: 1px !important;
+    }
+
+    /* Días de semana abreviados */
+    ::ng-deep .fc-col-header-cell {
+      font-size: 0.7rem !important;
+    }
+
+    /* Números de día más pequeños */
+    ::ng-deep .fc-daygrid-day-number {
+      font-size: 0.8rem !important;
+    }
+
+    /* Avatar del empleado más pequeño en móviles muy pequeños */
+    .employee-avatar .avatar-icon {
+      font-size: 1.5rem !important;
+      height: 1.5rem !important;
+      width: 1.5rem !important;
+    }
+
+    .employee-name {
+      font-size: 1rem !important;
+    }
+
+    /* Información del calendario más compacta */
+    .calendar-info {
+      font-size: 0.7rem !important;
+    }
+
+    .refresh-btn {
+      min-width: auto !important;
+      padding: 0.5rem !important;
+    }
+
+    /* Mensaje sin eventos más compacto */
+    .no-events-message .large-icon {
+      font-size: 3rem !important;
+      height: 3rem !important;
+      width: 3rem !important;
+    }
+
+    .no-events-message h3 {
+      font-size: 1rem !important;
+    }
+
+    .no-events-message p {
+      font-size: 0.8rem !important;
+    }
+  }
+
+  /* Mejoras para tablet */
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .calendar-wrapper {
+      height: calc(100vh - 220px);
+    }
+
+    ::ng-deep .fc-toolbar-title {
+      font-size: 1.3rem !important;
+    }
+
+    ::ng-deep .fc-button {
+      padding: 0.3rem 0.6rem !important;
+      font-size: 0.9rem !important;
+    }
+
+    .employee-avatar .avatar-icon {
+      font-size: 2.5rem !important;
+      height: 2.5rem !important;
+      width: 2.5rem !important;
+    }
+  }
+
+  /* Clases utilitarias */
+  .text-muted {
+    color: #666 !important;
+  }
+
+  .mt-2 {
+    margin-top: 0.5rem;
+  }
+
+  .mr-2 {
+    margin-right: 0.5rem;
+  }
+
+  .ml-3 {
+    margin-left: 0.75rem;
+  }
+
+  .mb-3 {
+    margin-bottom: 0.75rem;
+  }
+
+  .m-3 {
+    margin: 0.75rem;
+  }
+
+  .p-0 {
+    padding: 0;
+  }
+
+  .p-3 {
+    padding: 0.75rem;
+  }
+
+  .p-4 {
+    padding: 1rem;
+  }
+
+  .text-center {
+    text-align: center;
+  }
+
+  .text-sm {
+    font-size: 0.875rem;
+  }
+
+  .text-xl {
+    font-size: 1.25rem;
+  }
+
+  .font-medium {
+    font-weight: 500;
+  }
+
+  .flex {
+    display: flex;
+  }
+
+  .justify-content-between {
+    justify-content: space-between;
+  }
+
+  .justify-content-center {
+    justify-content: center;
+  }
+
+  .align-items-center {
+    align-items: center;
+  }
+
+  .h-full {
+    height: 100%;
+  }

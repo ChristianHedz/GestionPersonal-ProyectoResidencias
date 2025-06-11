@@ -1,0 +1,66 @@
+<app-employee-toolbar></app-employee-toolbar>
+<div class="calendar-container">
+  <!-- Header con información del empleado -->
+  <mat-card class="mb-3 m-3 trans">
+    <mat-card-header>
+      <div class="employee-avatar">
+        <mat-icon class="avatar-icon">account_circle</mat-icon>
+      </div>
+      <mat-card-title class="employee-name text-xl font-medium">
+        {{ currentEmployee()?.fullName || 'Empleado' }}
+      </mat-card-title>
+      <mat-card-subtitle class="employee-email">
+        {{ currentEmployee()?.email || '' }} • {{ calendarEvents().length }} eventos asignados
+      </mat-card-subtitle>
+    </mat-card-header>
+  </mat-card>
+
+  <!-- Calendario del empleado -->
+  <mat-card class="mb-3 m-3 trans">
+    <mat-card-header>
+      <mat-card-title class="text-xl font-medium">
+        <mat-icon class="mr-2">calendar_month</mat-icon>
+        Mis Eventos y Calendario
+      </mat-card-title>
+      <mat-card-subtitle>
+        Visualiza tus eventos, vacaciones, reuniones y días festivos asignados
+      </mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content class="p-0 m-3">
+      <!-- Botón de actualizar -->
+      <div class="flex justify-content-between align-items-center mb-3 responsive-controls">
+        <div class="calendar-info">
+          <span class="text-sm text-muted">
+            Mostrando eventos asignados a: <strong>{{ currentEmployee()?.fullName }}</strong>
+          </span>
+        </div>
+        <button mat-raised-button color="primary" (click)="refreshEvents()" [disabled]="isLoading()" class="refresh-btn">
+          <mat-icon>refresh</mat-icon>
+          <span class="btn-text">Actualizar</span>
+        </button>
+      </div>
+
+      <!-- Calendario -->
+      <div class="calendar-wrapper">
+        <div *ngIf="isLoading()" class="flex justify-content-center align-items-center h-full">
+          <mat-spinner [diameter]="50"></mat-spinner>
+        </div>
+        
+        <div [style.visibility]="isLoading() ? 'hidden' : 'visible'">
+          <full-calendar #calendar [options]="calendarOptions"></full-calendar>
+        </div>
+      </div>
+
+      <!-- Mensaje cuando no hay eventos -->
+      <div *ngIf="!isLoading() && calendarEvents().length === 0" class="no-events-message">
+        <div class="text-center p-4">
+          <mat-icon class="large-icon text-muted">event_available</mat-icon>
+          <h3 class="text-muted mt-2">No tienes eventos asignados</h3>
+          <p class="text-muted">
+            Cuando tengas eventos, reuniones o vacaciones asignadas, aparecerán aquí.
+          </p>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
