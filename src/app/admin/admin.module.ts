@@ -9,23 +9,21 @@ import { EmployeesResolver } from '../core/resolvers/employees.resolver';
 import { ChatbotConfigComponent } from '../pages/chatbot-config/chatbot-config.component';
 import { ChartsComponent } from '../pages/charts/charts.component';
 import { EmployeeProfileComponent } from '../pages/employee-profile/employee-profile.component';
+import { isAdminGuard } from '../auth/guards/is-admin.guard';
+import { isAuthGuard } from '../auth/guards/is-auth.guard';
+import { CalendarComponent } from '../pages/calendar/calendar.component';
 
 
 const routes: Routes = [
   {
     path: 'registro',
     component: DashboardComponent,
-    // canMatch: [isAuthGuard]
-  },
-  {
-    path: 'info',
-    component: InfoComponent,
-    // canMatch: [isAuthGuard]
+    canMatch: [isAuthGuard]
   },
   {
     path: 'empleados',
     component: EmployeesComponent,
-    // canMatch: [isAdminGuard]
+    canMatch: [isAdminGuard],
     resolve: {
       employees: EmployeesResolver
     }
@@ -33,22 +31,22 @@ const routes: Routes = [
   {
     path: 'asistencias',
     component: AttendanceComponent,
-    // canMatch: [isAuthGuard]
+    canMatch: [isAdminGuard]
   },
   {
     path: 'chatbot-config',
     component: ChatbotConfigComponent,
-    // canMatch: [isAdminGuard]
+    canMatch: [isAdminGuard]
   },
   {
     path: 'graficas',
     component: ChartsComponent,
-    // canMatch: [isAuthGuard]
+    canMatch: [isAdminGuard]
   },
   {
-    path: 'perfil',
-    component: EmployeeProfileComponent,
-    // canMatch: [isAuthGuard]
+    path: 'calendar',
+    component: CalendarComponent,
+    canMatch: [isAuthGuard]
   },
   {
     path: '',
