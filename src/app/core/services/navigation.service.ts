@@ -13,7 +13,7 @@ export class NavigationService {
   ) {}
 
   navigateAfterAuth(role: string): void {
-    const route = role === 'ADMIN' ? '/admin/home' : '/admin/info';
+    const route = role === 'ADMIN' ? '/admin/home' : '/employee/profile';
     this.router.navigateByUrl(route);
   }
 

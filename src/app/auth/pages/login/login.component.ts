@@ -67,7 +67,7 @@ export class LoginComponent{
           next: (employee: AuthResponse) => {
             Swal.fire('¡Inicio de sesión exitoso!', 'Has iniciado sesión correctamente', 'success');
             employee.role === 'ADMIN' ? this.router.navigateByUrl('/admin/home')
-             : this.router.navigateByUrl('/admin/info');
+             : this.router.navigateByUrl('/employee/profile');
           },
           error: (error: ApiError) => {
             console.error('Error de autenticación:', error);

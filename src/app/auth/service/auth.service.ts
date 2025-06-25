@@ -35,32 +35,30 @@ export class AuthService {
   public currentUser = this._currentUser.asReadonly();
 
   public isAdmin = computed(() => this.currentUser()?.role === 'ADMIN');
+  public isEmployee = computed(() => this.currentUser()?.role === 'EMPLOYEE');
 
   constructor() {
     this.checkAuthStatus();
   }
 
   private checkAuthStatus(): void {
-    this.isLogged().subscribe();
-  }
-
-  isLogged(): Observable<boolean> {
     const isLogged = localStorage.getItem(this.STORAGE_KEY) === AuthStatus.authenticated;
-    this._authStatus.set(isLogged ? AuthStatus.authenticated : AuthStatus.notAuthenticated);
     
-    if (!isLogged) return of(false);
-    console.log('Usuario autenticado pendiente');
-    return this.http.get<AuthResponse>(`${this.url}${API_ENDPOINTS.PROFILE}`)
+    if (!isLogged) {
+      this.handleLogout();
+      return;
+    }
+    this.http.get<AuthResponse>(`${this.url}${API_ENDPOINTS.PROFILE}`)
       .pipe(
-        tap(employee => this._currentUser.set(employee)),
-        tap(() => this._authStatus.set(AuthStatus.authenticated)),
-        tap(() => console.log('Usuario autenticado')),
-        map(() => true),
+        tap(employee => {
+          this._currentUser.set(employee)
+          this._authStatus.set(AuthStatus.authenticated)
+        }),
         catchError(() => {
           this.handleLogout();
-          return of(false);
+          return of(null);
         })
-      );
+      ).subscribe();
   }
 
   googleLogin(token: string): Observable<AuthResponse> {

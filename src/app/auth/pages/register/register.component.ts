@@ -62,7 +62,7 @@ export class RegisterComponent {
             this.spinner.hide();
             Swal.fire('¡Inicio de sesión exitoso!', 'Has iniciado sesión correctamente', 'success');
             employee.role === 'ADMIN' ? this.router.navigateByUrl('/admin/home')
-             : this.router.navigateByUrl('/admin/inicio');
+             : this.router.navigateByUrl('/employee/profile');
           },
         error: (error: ApiError) => {
           this.spinner.hide();
