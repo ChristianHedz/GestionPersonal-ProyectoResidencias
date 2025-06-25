@@ -11,7 +11,9 @@
     <div class="avatar-container mb-3">
       <img class="avatar w-8rem h-8rem border-circle mx-auto shadow-2" 
            [src]="employee.photo || 'https://www.w3schools.com/w3images/avatar2.png'" 
-           [alt]="employee.fullName">
+           [alt]="employee.fullName"
+           (error)="onImageError($event)"
+           loading="lazy">
     </div>
     
     <!-- Información básica -->

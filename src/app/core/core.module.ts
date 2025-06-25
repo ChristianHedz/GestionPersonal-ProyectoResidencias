@@ -4,8 +4,6 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { AuthService } from '../auth/service/auth.service';
 import { ErrorHandlerService } from '../service/error-handler.service';
 import { NavigationService } from './services/navigation.service';
-import { AuthInterceptor } from '../auth/interceptors/auth.interceptor';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
 
 @NgModule({
   imports: [
@@ -15,7 +13,7 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
     AuthService,
     ErrorHandlerService,
     NavigationService,
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
+    // El interceptor ahora se configura funcionalmente en app.config.ts
   ],
   exports: [
     CommonModule,

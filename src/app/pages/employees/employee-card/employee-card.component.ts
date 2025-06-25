@@ -20,4 +20,11 @@ import { EmployeeDTO } from '../../../auth/interfaces/EmployeeDTO';
 export class EmployeeCardComponent {
   @Input() employee!: EmployeeDTO;
   @Input() onEdit!: (employee: EmployeeDTO, event: Event) => void;
+
+  onImageError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    if (img) {
+      img.src = 'https://www.w3schools.com/w3images/avatar2.png';
+    }
+  }
 }

@@ -1,0 +1,77 @@
+.photo-upload-container {
+  text-align: center;
+  padding: 1rem;
+}
+
+.photo-display {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 1rem;
+}
+
+.avatar {
+  border: 3px solid #e0e0e0;
+  transition: all 0.3s ease;
+  object-fit: cover;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.avatar:hover {
+  transform: scale(1.05);
+  border-color: #2196f3;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.upload-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  backdrop-filter: blur(2px);
+}
+
+.photo-actions {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.photo-actions button {
+  min-width: 120px;
+  height: 40px;
+  border-radius: 20px;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0.5px;
+}
+
+.opacity-50 {
+  opacity: 0.5;
+  filter: grayscale(20%);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .photo-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .photo-actions button {
+    width: 100%;
+    max-width: 200px;
+  }
+  
+  .avatar {
+    width: 6rem !important;
+    height: 6rem !important;
+  }
+} 
