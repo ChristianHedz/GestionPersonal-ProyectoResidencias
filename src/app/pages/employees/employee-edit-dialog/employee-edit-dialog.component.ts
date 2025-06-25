@@ -8,8 +8,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTabsModule } from '@angular/material/tabs';
 import { EmployeeDTO } from '../../../auth/interfaces/EmployeeDTO';
 import { EmployeesService } from '../../../service/employees.service';
+import { PhotoUploadComponent } from '../../../components/photo-upload/photo-upload.component';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -23,7 +25,9 @@ import Swal from 'sweetalert2';
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    MatIconModule
+    MatIconModule,
+    MatTabsModule,
+    PhotoUploadComponent
   ],
   templateUrl: './employee-edit-dialog.component.html',
   styleUrls: ['./employee-edit-dialog.component.css'],
@@ -38,6 +42,7 @@ export class EmployeeEditDialogComponent implements OnInit {
   statusOptions = ['ACTIVO', 'BAJA', 'VACACIONES', 'INACTIVO'];
   submitting = false;
   error: string | null = null;
+  currentPhotoUrl: string | null = null;
 
   readonly employeeForm = this.fb.group({
     fullName: ['', [Validators.required,Validators.pattern(this.validatorsService.firstNameAndLastnamePattern)]],
@@ -48,9 +53,9 @@ export class EmployeeEditDialogComponent implements OnInit {
   });
   
   ngOnInit(): void {
-
     // Initialize form with employee data
     if (this.data && this.data.employee) {
+      this.currentPhotoUrl = this.data.employee.photo || null;
       this.employeeForm.patchValue({
         fullName: this.data.employee.fullName,
         email: this.data.employee.email,
@@ -59,6 +64,17 @@ export class EmployeeEditDialogComponent implements OnInit {
         status: this.data.employee.status
       });
     }
+  }
+
+  onPhotoUpdated(newPhotoUrl: string | null): void {
+    this.currentPhotoUrl = newPhotoUrl;
+    this.employeeForm.patchValue({ photo: newPhotoUrl || '' });
+  }
+
+  onPhotoUrlInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const value = input?.value || null;
+    this.onPhotoUpdated(value);
   }
 
   saveChanges(): void {
@@ -73,7 +89,7 @@ export class EmployeeEditDialogComponent implements OnInit {
       fullName: this.employeeForm.get('fullName')?.value || '',
       email: this.employeeForm.get('email')?.value || '',
       phone: this.employeeForm.get('phone')?.value || '',
-      photo: this.employeeForm.get('photo')?.value || '',
+      photo: this.currentPhotoUrl || '',
       status: this.employeeForm.get('status')?.value || 'ACTIVO'
     };
 

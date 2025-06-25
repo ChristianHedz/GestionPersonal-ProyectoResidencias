@@ -24,6 +24,14 @@ export class EmployeesService {
     )
   }
 
+  getEmployeeById(id: number): Observable<EmployeeDTO> {
+    return this.http.get<EmployeeDTO>(`${this.environment}/employee/${id}`)
+    .pipe(
+      tap((data) => console.log('Employee by id:', data)),
+      catchError((error) => throwError(() => this.ErrorHandler(error)))
+    );
+  }
+
   updateEmployee(id: number, employee: EmployeeDTO): Observable<EmployeeDTO> {
     return this.http.put<EmployeeDTO>(`${this.environment}/employee/${id}`, employee)
     .pipe(
@@ -39,6 +47,38 @@ export class EmployeesService {
       tap((data) => console.log('Assist registered:', data)),
       catchError((error) => throwError(() => this.ErrorHandler(error)))
     )
+  }
+
+  /**
+   * Sube una foto para un empleado específico
+   * @param employeeId ID del empleado
+   * @param photo Archivo de la foto
+   * @returns Observable con la respuesta del servidor incluyendo la URL de la foto
+   */
+  uploadEmployeePhoto(employeeId: number, photo: File): Observable<{message: string, photoUrl: string}> {
+    const formData = new FormData();
+    formData.append('photo', photo);
+
+    return this.http.post<{message: string, photoUrl: string}>(
+      `${this.environment}/employee/${employeeId}/upload-photo`, 
+      formData
+    ).pipe(
+      tap((response) => console.log('Photo uploaded successfully:', response)),
+      catchError((error) => throwError(() => this.ErrorHandler(error)))
+    );
+  }
+
+  /**
+   * Elimina la foto de un empleado específico
+   * @param employeeId ID del empleado
+   * @returns Observable con la respuesta del servidor
+   */
+  deleteEmployeePhoto(employeeId: number): Observable<{message: string}> {
+    return this.http.delete<{message: string}>(`${this.environment}/employee/${employeeId}/delete-photo`)
+    .pipe(
+      tap((response) => console.log('Photo deleted successfully:', response)),
+      catchError((error) => throwError(() => this.ErrorHandler(error)))
+    );
   }
 
 }

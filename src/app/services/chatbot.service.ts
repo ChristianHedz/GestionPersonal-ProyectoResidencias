@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../env/enviroments';
 
 export interface ChatMessage {
   content: string;
@@ -29,7 +30,7 @@ export interface ChatbotDocument {
 })
 export class ChatbotService {
   private readonly http = inject(HttpClient);
-  private readonly API_URL = 'http://localhost:8080';
+  private readonly API_URL = environment.urlApi;
 
   /**
    * Envía un mensaje de texto al chatbot y recibe una respuesta en texto

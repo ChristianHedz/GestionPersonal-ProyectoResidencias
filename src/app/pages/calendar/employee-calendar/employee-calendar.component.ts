@@ -17,6 +17,9 @@ import { CalendarEventDTO } from '../../../core/models/calendar-event.dto';
 import { EventType, CalendarEvent } from '../../../interfaces/event.interfaces';
 import { EmployeeDTO } from '../../../auth/interfaces/EmployeeDTO';
 import { EmployeeToolbarComponent } from '../../../shared/toolbar/employee-toolbar/employee-toolbar.component';
+import { toObservable } from '@angular/core/rxjs-interop';
+import { filter, take, Observable } from 'rxjs';
+import { AuthStatus } from '../../../auth/interfaces/authStatus.enum';
 
 @Component({
   selector: 'app-employee-profile',
@@ -42,6 +45,8 @@ export class EmployeeCalendarComponent implements OnInit {
 
   // Calendar API reference
   @ViewChild('calendar') calendarComponent: any;
+
+  private readonly authStatus$: Observable<AuthStatus> = toObservable(inject(AuthService).authStatus);
 
   // Signals for reactive state management
   isLoading = signal(true);
@@ -99,6 +104,9 @@ export class EmployeeCalendarComponent implements OnInit {
     eventClick: this.handleEventClick.bind(this)
   };
 
+  constructor() {
+  }
+
   ngOnInit(): void {
     this.initializeEmployeeData();
     this.addCalendarStyles();
@@ -108,94 +116,56 @@ export class EmployeeCalendarComponent implements OnInit {
    * Inicializa los datos del empleado autenticado
    */
   initializeEmployeeData(): void {
-    console.log('Iniciando obtención de datos del empleado...');
-    console.log('Estado de autenticación:', this.authService.authStatus());
-    
-    // Verificamos el estado de autenticación y obtenemos el usuario
-    this.authService.isLogged().subscribe({
-      next: (isAuthenticated) => {
-        console.log('¿Usuario autenticado?:', isAuthenticated);
-        
-        if (!isAuthenticated) {
-          console.error('Usuario no autenticado');
-          this.showNotification('Usuario no autenticado', 'error');
-          this.isLoading.set(false);
-          return;
-        }
+    this.authStatus$.pipe(
+      filter(status => status !== AuthStatus.checking),
+      take(1)
+    ).subscribe(status => {
+      if (status !== AuthStatus.authenticated) {
+        this.showNotification('Usuario no autenticado', 'error');
+        this.isLoading.set(false);
+        return;
+      }
 
-        // Ahora que sabemos que está autenticado, obtenemos el usuario
-        const authUser = this.authService.currentUser();
-        console.log('Usuario autenticado obtenido:', authUser);
-        
-        if (!authUser) {
-          console.error('No se pudo obtener el usuario autenticado');
-          this.showNotification('Error obteniendo datos del usuario', 'error');
-          this.isLoading.set(false);
-          return;
-        }
+      const authUser = this.authService.currentUser();
+      if (!authUser?.id) {
+        this.showNotification('Error obteniendo datos del usuario', 'error');
+        this.isLoading.set(false);
+        return;
+      }
 
-        if (!authUser.id) {
-          console.error('El usuario autenticado no tiene ID:', authUser);
-          this.showNotification('El usuario no tiene un ID válido', 'error');
-          this.isLoading.set(false);
-          return;
-        }
+      this.employeeId.set(authUser.id);
 
-        console.log('ID del usuario autenticado:', authUser.id);
-        this.employeeId.set(authUser.id);
-
-        // Ahora obtenemos la lista completa de empleados para encontrar el empleado actual
-        this.employeesService.listAllEmployees().subscribe({
-          next: (employees: EmployeeDTO[]) => {
-            console.log('Lista de empleados obtenida:', employees);
-            
-            // Buscar el empleado que coincida con el ID del usuario autenticado
-            const currentEmployee = employees.find(emp => emp.id === authUser.id);
-            
-            if (currentEmployee) {
-              console.log('Empleado encontrado:', currentEmployee);
-              this.currentEmployee.set(currentEmployee);
-              this.loadEmployeeEvents();
-            } else {
-              console.error('No se encontró el empleado con ID:', authUser.id);
-              // Si no encontramos el empleado en la lista, creamos uno básico con los datos del auth
-              const basicEmployee: EmployeeDTO = {
-                id: authUser.id,
-                fullName: authUser.fullName,
-                email: authUser.email,
-                phone: '',
-                photo: '',
-                status: 'ACTIVE'
-              };
-              console.log('Usando datos básicos del usuario:', basicEmployee);
-              this.currentEmployee.set(basicEmployee);
-              this.loadEmployeeEvents();
-            }
-          },
-          error: (error) => {
-            console.error('Error obteniendo lista de empleados:', error);
-            
-            // Si falla la obtención de empleados, creamos uno básico con los datos del auth
-            const basicEmployee: EmployeeDTO = {
+      this.employeesService.listAllEmployees().subscribe({
+        next: (employees: EmployeeDTO[]) => {
+          const currentEmployee = employees.find(emp => emp.id === authUser.id);
+          
+          if (currentEmployee) {
+            this.currentEmployee.set(currentEmployee);
+          } else {
+            this.currentEmployee.set({
               id: authUser.id,
               fullName: authUser.fullName,
               email: authUser.email,
               phone: '',
               photo: '',
               status: 'ACTIVE'
-            };
-            console.log('Error en empleados, usando datos básicos:', basicEmployee);
-            this.currentEmployee.set(basicEmployee);
-            this.showNotification('Usando información básica del usuario', 'info');
-            this.loadEmployeeEvents();
+            });
           }
-        });
-      },
-      error: (error) => {
-        console.error('Error verificando autenticación:', error);
-        this.showNotification('Error verificando autenticación', 'error');
-        this.isLoading.set(false);
-      }
+          this.loadEmployeeEvents();
+        },
+        error: (error: any) => {
+          this.currentEmployee.set({
+            id: authUser.id,
+            fullName: authUser.fullName,
+            email: authUser.email,
+            phone: '',
+            photo: '',
+            status: 'ACTIVE'
+          });
+          this.showNotification('Usando información básica del usuario', 'info');
+          this.loadEmployeeEvents();
+        }
+      });
     });
   }
 

@@ -1,43 +1,156 @@
 <div class="surface-ground w-full min-h-screen p-0 m-0 flex flex-column">
     <app-employee-toolbar></app-employee-toolbar>
-    <div class="flex flex-grow-1 justify-content-center align-items-center mb-5">
-      <div class="grid grid-nogutter mb-5 mt-4 md:mt-0">
-        <div class="col-12 md:col-6 flex align-items-center justify-content-center animate__animated animate__fadeInUp">
-          <div class="p-0 sm:px-3 md:pl-8 lg:pl-10">
-            <h1 class="text-5xl md:text-6xl font-bold text-white text-center md:text-left mt-text-0">Plataforma<br/>de gestion de personal</h1>
-            <p class="text-base md:text-xl line-height-3 mb-5 text-center md:text-left text-white-alpha-90 px-3 sm:px-5 md:pl-0 lg:mr-3">
-              Plataforma de gestion de personal , control de asistencias, accesos, nominas , vacaciones , graficas, asistente virtual, 
-            </p>
-            <div class="flex flex-column md:flex-row justify-content-center md:justify-content-start">
-                <button mat-raised-button color="primary" class="p-button-lg mx-5 md:ml-0 mr-0 md:mr-3 mb-3 md:mb-0 cursor-pointer">
-                  <span class="px-3 py-2 flex align-items-center">
-                    Ver plataforma
-                    <mat-icon class="ml-2">arrow_forward</mat-icon>
+    <div class="flex flex-grow-1 justify-content-center align-items-center p-4">
+      <!-- Loading spinner -->
+      <div *ngIf="isLoading" class="flex justify-content-center align-items-center">
+        <mat-spinner diameter="50"></mat-spinner>
+      </div>
+
+      <!-- Profile content -->
+      <div *ngIf="!isLoading && currentEmployee" class="w-full max-w-4xl">
+        <div class="grid grid-nogutter">
+          
+          <!-- Header with title -->
+          <div class="col-12 mb-4">
+            <h1 class="text-4xl font-bold text-white text-center mb-2">Mi Perfil</h1>
+            <p class="text-lg text-white-alpha-90 text-center">Gestiona tu información personal y foto de perfil</p>
+          </div>
+
+          <!-- Main profile card -->
+          <div class="col-12 flex justify-content-center">
+            <mat-card class="w-full max-w-2xl shadow-4 border-round-lg">
+              <mat-card-header class="pb-3 border-bottom-1 border-300">
+                <mat-card-title class="text-2xl font-bold text-center w-full">
+                  {{ currentEmployee.fullName }}
+                </mat-card-title>
+              </mat-card-header>
+
+              <mat-card-content class="p-4">
+                <div class="grid">
+                  
+                  <!-- Photo section -->
+                  <div class="col-12 md:col-4 text-center mb-4">
+                    <h3 class="text-lg font-semibold mb-3">Foto de Perfil</h3>
+                    <app-photo-upload
+                      [employeeId]="currentEmployee.id"
+                      [photoUrl]="currentEmployee.photo"
+                      [employeeName]="currentEmployee.fullName"
+                      [canEdit]="true"
+                      (photoUpdated)="onPhotoUpdated($event)">
+                    </app-photo-upload>
+                  </div>
+
+                  <!-- Employee information -->
+                  <div class="col-12 md:col-8">
+                    <h3 class="text-lg font-semibold mb-3">Información Personal</h3>
+                    
+                    <!-- Personal info grid -->
+                    <div class="grid">
+                      <!-- Full name -->
+                      <div class="col-12 mb-3">
+                        <div class="flex align-items-center">
+                          <mat-icon class="text-primary mr-2">person</mat-icon>
+                          <div>
+                            <p class="text-sm text-600 m-0">Nombre Completo</p>
+                            <p class="text-lg font-medium m-0">{{ currentEmployee.fullName }}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Email -->
+                      <div class="col-12 md:col-6 mb-3">
+                        <div class="flex align-items-center">
+                          <mat-icon class="text-primary mr-2">email</mat-icon>
+                          <div>
+                            <p class="text-sm text-600 m-0">Email</p>
+                            <p class="text-base m-0">{{ currentEmployee.email }}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Phone -->
+                      <div class="col-12 md:col-6 mb-3">
+                        <div class="flex align-items-center">
+                          <mat-icon class="text-primary mr-2">phone</mat-icon>
+                          <div>
+                            <p class="text-sm text-600 m-0">Teléfono</p>
+                            <p class="text-base m-0">{{ currentEmployee.phone || 'No registrado' }}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Status -->
+                      <div class="col-12 md:col-6 mb-3">
+                        <div class="flex align-items-center">
+                          <mat-icon class="text-primary mr-2">work</mat-icon>
+                          <div>
+                            <p class="text-sm text-600 m-0">Estado</p>
+                            <span class="inline-flex align-items-center px-2 py-1 border-round text-sm font-medium"
+                                  [ngClass]="{
+                                    'bg-green-100 text-green-700': currentEmployee.status === 'ACTIVO',
+                                    'bg-orange-100 text-orange-700': currentEmployee.status === 'BAJA',
+                                    'bg-blue-100 text-blue-700': currentEmployee.status === 'VACACIONES',
+                                    'bg-purple-100 text-purple-700': currentEmployee.status === 'INACTIVO',
+                                    'bg-gray-100 text-gray-700': !['ACTIVO', 'BAJA', 'VACACIONES', 'INACTIVO'].includes(currentEmployee.status)
+                                  }">
+                              <mat-icon class="mr-1 text-sm"
+                                       [ngClass]="{
+                                         'text-green-600': currentEmployee.status === 'ACTIVO',
+                                         'text-orange-600': currentEmployee.status === 'BAJA',
+                                         'text-blue-600': currentEmployee.status === 'VACACIONES',
+                                         'text-purple-600': currentEmployee.status === 'INACTIVO',
+                                         'text-gray-600': !['ACTIVO', 'BAJA', 'VACACIONES', 'INACTIVO'].includes(currentEmployee.status)
+                                       }">
+                                {{ currentEmployee.status === 'ACTIVO' ? 'check_circle' : 
+                                   currentEmployee.status === 'BAJA' ? 'home' :
+                                   currentEmployee.status === 'VACACIONES' ? 'beach_access' :
+                                   currentEmployee.status === 'INACTIVO' ? 'pause_circle' : 'help' }}
+                              </mat-icon>
+                              {{ currentEmployee.status }}
                   </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Employee ID -->
+                      <div class="col-12 md:col-6 mb-3">
+                        <div class="flex align-items-center">
+                          <mat-icon class="text-primary mr-2">badge</mat-icon>
+                          <div>
+                            <p class="text-sm text-600 m-0">ID de Empleado</p>
+                            <p class="text-base font-mono m-0">#{{ currentEmployee.id.toString().padStart(4, '0') }}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </mat-card-content>
+
+              <mat-card-actions class="p-3 border-top-1 border-300 text-center">
+                <button mat-raised-button color="primary" class="mr-2">
+                  <mat-icon class="mr-1">edit</mat-icon>
+                  Editar Información
                 </button>
-                <button mat-stroked-button color="primary" class="border-1 border-white mx-5 md:mx-2 cursor-pointer">
-                  <span class="px-3 py-2 flex align-items-center">
-                    <mat-icon class="mr-2">schedule</mat-icon>
-                    Asistencias
-                  </span>
+                <button mat-stroked-button color="accent">
+                  <mat-icon class="mr-1">security</mat-icon>
+                  Cambiar Contraseña
                 </button>
-              </div>
+              </mat-card-actions>
+            </mat-card>
           </div>
         </div>
-        <div class="col-12 md:col-6 flex align-items-center justify-content-center mt-4">
-            <div class="attendance-container relative w-15rem h-15rem sm:w-22rem sm:h-22rem md:w-25rem md:h-22rem lg:w-22rem lg:h-22rem ">
-              <div class="avatar-3d-container">
-                <div class="avatar-3d">
-                  <div class="avatar-face front"><mat-icon>account_circle</mat-icon></div>
-                  <div class="avatar-face back"><mat-icon>account_circle</mat-icon></div>
-                  <div class="avatar-face right"><mat-icon>account_circle</mat-icon></div>
-                  <div class="avatar-face left"><mat-icon>account_circle</mat-icon></div>
-                  <div class="avatar-face top"><mat-icon>account_circle</mat-icon></div>
-                  <div class="avatar-face bottom"><mat-icon>account_circle</mat-icon></div>
                 </div>
-              </div>
-            </div>
-          </div>
+
+      <!-- Error state -->
+      <div *ngIf="!isLoading && !currentEmployee" class="text-center">
+        <mat-icon class="text-6xl text-500 mb-3">error_outline</mat-icon>
+        <h2 class="text-white text-2xl mb-2">Error al cargar el perfil</h2>
+        <p class="text-white-alpha-90">No se pudo cargar la información del empleado.</p>
+        <button mat-raised-button color="primary" (click)="loadCurrentEmployee()">
+          <mat-icon class="mr-1">refresh</mat-icon>
+          Reintentar
+        </button>
       </div>
     </div>
   </div>
