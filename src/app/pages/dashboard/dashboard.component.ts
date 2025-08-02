@@ -15,6 +15,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ToolbarComponent } from '../../shared/toolbar/toolbar.component';
+import { EmployeeToolbarComponent } from '../../shared/toolbar/employee-toolbar/employee-toolbar.component';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ZXingScannerModule } from '@zxing/ngx-scanner';
 import { BarcodeFormat } from '@zxing/library';
@@ -23,6 +24,7 @@ import 'animate.css';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { LateDialogComponent } from '../../components/late-dialog/late-dialog.component';
 import { ChatbotBubbleComponent } from '../../components/chatbot-bubble/chatbot-bubble.component';
+import { AuthService } from '../../auth/service/auth.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -46,6 +48,7 @@ import { ChatbotBubbleComponent } from '../../components/chatbot-bubble/chatbot-
     MatToolbarModule,
     // Componentes propios
     ToolbarComponent,
+    EmployeeToolbarComponent,
     ChatbotBubbleComponent
   ],
   templateUrl: './dashboard.component.html',
@@ -73,6 +76,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   public validatorsService = inject(ValidatorsService);
   private dialog = inject(MatDialog);
+  private authService = inject(AuthService);
+
+  // Computed para determinar el rol del usuario
+  readonly isAdmin = computed(() => this.authService.isAdmin());
+  readonly isEmployee = computed(() => this.authService.isEmployee());
 
   // Formulario de asistencia
   readonly assistForm = this.fb.group({

@@ -1,6 +1,9 @@
 <div class="flex flex-column h-screen">
-  <!-- Toolbar -->
-  <app-toolbar></app-toolbar>
+  <!-- Toolbar Admin -->
+  <app-toolbar *ngIf="isAdmin()"></app-toolbar>
+  
+  <!-- Toolbar Employee -->
+  <app-employee-toolbar *ngIf="isEmployee()"></app-employee-toolbar>
 
   <!-- Content Area -->
   <div class="flex-1 overflow-y-auto p-4">
