@@ -1,6 +1,6 @@
 import { AuthResponse } from './../../interfaces/authResponse';
-import { Component, computed, inject} from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, computed, inject, OnInit } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators, FormGroup } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -37,23 +37,28 @@ import { ApiError } from '../../interfaces/apiError';
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
-export class LoginComponent{
+export class LoginComponent implements OnInit {
     
     private validatorsService = inject(ValidatorsService);
     private fb = inject(FormBuilder);
     private router = inject(Router);
     private authService = inject(AuthService);
     
-    public loginForm = this.fb.group({
-      email: ['', [
-        Validators.required, 
-        Validators.pattern(this.validatorsService.emailPattern)
-      ]],
-      password: ['', [Validators.required]],
-    });
+    public loginForm!: FormGroup;
+    public hidePassword = true;
 
-    email = computed(() => this.loginForm.controls.email);
-    password = computed(() => this.loginForm.controls.password);
+    ngOnInit(): void {
+      this.loginForm = this.fb.group({
+        email: ['', [
+          Validators.required, 
+          Validators.pattern(this.validatorsService.emailPattern)
+        ]],
+        password: ['', [Validators.required]],
+      });
+    }
+    
+    email = computed(() => this.loginForm.controls['email']);
+    password = computed(() => this.loginForm.controls['password']);
     
     login(): void {
       if (this.loginForm.invalid) {

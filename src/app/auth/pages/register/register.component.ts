@@ -33,6 +33,7 @@ export class RegisterComponent {
   private router = inject(Router);
   private AuthService = inject(AuthService);
   private spinner = inject(NgxSpinnerService);
+  public hidePassword = true;
 
   
   public registerForm = this.fb.group({
@@ -41,11 +42,11 @@ export class RegisterComponent {
     password: ['',[Validators.required]],
   });
   
-  fullName = computed(()=> this.registerForm.controls.fullName)
+  fullName = computed(()=> this.registerForm.controls['fullName'])
 
-  email = computed(()=> this.registerForm.controls.email)
+  email = computed(()=> this.registerForm.controls['email'])
 
-  password = computed(()=> this.registerForm.controls.password)
+  password = computed(()=> this.registerForm.controls['password'])
 
   register(): void {
     if (this.registerForm.invalid) {
