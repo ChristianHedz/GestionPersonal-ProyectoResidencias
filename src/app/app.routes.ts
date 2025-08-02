@@ -10,16 +10,17 @@ import { EmployeeCalendarComponent } from './pages/calendar/employee-calendar/em
 import { isAdminGuard } from './auth/guards/is-admin.guard';
 import { isEmployeeGuard } from './auth/guards/is-employee.guard';
 import { EmployeeDataComponent } from './pages/employee-data/employee-data.component';
+import { DashboardComponent } from './pages/dashboard/dashboard.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'registro', component: RegisterComponent, canMatch: [isNotAuthGuard] },
   { path: 'login', component: LoginComponent, canMatch: [isNotAuthGuard] },
-  { path: 'home', component: HomeComponent, data: { mode: 'user' }, canMatch: [isNotAuthGuard]},
   { path: 'admin/home', component: HomeComponent, data: { mode: 'admin' }, canMatch: [isAdminGuard]},
+  { path: 'employee/home', component: HomeComponent, canMatch: [isEmployeeGuard]},
   { path: 'employee/calendar', component: EmployeeCalendarComponent,canMatch: [isEmployeeGuard]},
-  { path: 'employee/home', component: EmployeeProfileComponent, canMatch: [isEmployeeGuard]},
-  { path: 'employee/profile', component: EmployeeDataComponent, canMatch: [isEmployeeGuard]},
+  { path: 'employee/profile', component: EmployeeProfileComponent, canMatch: [isEmployeeGuard]},
+  { path: 'employee/dashboard', component: DashboardComponent, canMatch: [isEmployeeGuard]},
   {
     path: 'admin',
     loadChildren: () => import('./admin/admin.module')

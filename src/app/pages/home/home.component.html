@@ -1,7 +1,8 @@
+<app-employee-toolbar></app-employee-toolbar>
 <div class="surface-ground w-full min-h-screen p-0 m-0 flex flex-column">
   <app-toolbar *ngIf="isAdmin"></app-toolbar>
     <div class="flex flex-grow-1 justify-content-center align-items-center mb-5">
-      <div class="grid grid-nogutter mb-5 mt-4">
+      <div class="grid grid-nogutter mb-5">
         <div class="col-12 md:col-6 flex align-items-center justify-content-center animate__animated animate__fadeInUp">
           <div class="p-0 sm:px-3 md:pl-8 lg:pl-10">
             <h1 class="text-5xl md:text-6xl font-bold text-white text-center md:text-left mt-text-0">Plataforma<br/>de gestion de personal</h1>
@@ -9,16 +10,16 @@
               Plataforma de gestion de personal , control de asistencias, accesos, nominas , vacaciones , graficas, asistente virtual.
             </p>
             <div class="flex flex-column md:flex-row justify-content-center md:justify-content-start">
-              <button mat-raised-button color="primary" class="p-button-lg mx-5 md:ml-0 mr-0 md:mr-3 mb-3 md:mb-0 cursor-pointer" [routerLink]="isAdmin ? '/admin/registro' : '/login'">
+              <button mat-raised-button color="primary" class="p-button-lg mx-5 md:ml-0 mr-0 md:mr-3 mb-3 md:mb-0 cursor-pointer" [routerLink]="isAdmin ? '/admin/registro' : '/employee/dashboard'">
                 <span class="px-3 py-2 flex align-items-center justify-content-center md:justify-content-start text-center">
-                  {{ isAdmin ? 'Registrar Asistencias' : 'Iniciar Sesión' }}
-                  <mat-icon class="ml-2">{{ isAdmin ? 'schedule' : 'login' }}</mat-icon>
+                  {{ isAdmin ? 'Registrar Asistencias' : 'Registrar mi Asistencia' }}
+                  <mat-icon class="ml-2">{{ isAdmin ? 'schedule' : 'person_add' }}</mat-icon>
                 </span>
               </button>
-              <button mat-stroked-button color="primary" class="border-1 border-white mx-5 md:mx-2 cursor-pointer" [routerLink]="isAdmin ? '/admin/asistencias' : '/registro'">
+              <button mat-stroked-button color="primary" class="border-1 border-white mx-5 md:mx-2 cursor-pointer" [routerLink]="isAdmin ? '/admin/asistencias' : '/employee/calendar'">
                 <span class="px-3 py-2 flex align-items-center justify-content-center md:justify-content-start text-center">
-                  <mat-icon class="mr-2">{{ isAdmin ? 'event' : 'person_add' }}</mat-icon>
-                  {{ isAdmin ? 'Ver Asistencias' : 'Registrarse' }}
+                  <mat-icon class="mr-2">{{ isAdmin ? 'event' : 'calendar_month' }}</mat-icon>
+                  {{ isAdmin ? 'Ver Asistencias' : 'Ver mis Eventos' }}
                 </span>
               </button>
             </div>

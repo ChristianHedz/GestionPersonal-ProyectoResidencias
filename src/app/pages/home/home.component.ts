@@ -4,11 +4,12 @@ import { MatIcon } from '@angular/material/icon';
 import { RouterModule, Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { filter, map } from 'rxjs/operators';
 import { ToolbarComponent } from '../../shared/toolbar/toolbar.component';
+import { EmployeeToolbarComponent } from '../../shared/toolbar/employee-toolbar/employee-toolbar.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [MatIcon, RouterModule, CommonModule, ToolbarComponent],
+  imports: [MatIcon, RouterModule, CommonModule, ToolbarComponent, EmployeeToolbarComponent],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
