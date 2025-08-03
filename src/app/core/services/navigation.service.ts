@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthStatus } from '../../auth/interfaces/authStatus.enum';
-import { AuthService } from '../../auth/service/auth.service';
+import { AuthStatus } from '../models/auth/authStatus.enum';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -18,11 +18,11 @@ export class NavigationService {
   }
 
   navigateToLogin(): void {
-    this.router.navigateByUrl('/login');
+    this.router.navigateByUrl('/auth/login');
   }
 
   navigateToRegister(): void {
-    this.router.navigateByUrl('/registro');
+    this.router.navigateByUrl('/auth/register');
   }
 
   navigateToDashboard(): void {

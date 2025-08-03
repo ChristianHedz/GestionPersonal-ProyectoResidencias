@@ -4,7 +4,7 @@ import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/
 import { importProvidersFrom } from '@angular/core';
 import { routes } from './app.routes';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-import { authInterceptor} from './auth/interceptors/auth.interceptor';
+import { authInterceptor} from './core/interceptors/auth.interceptor';
 import { CoreModule } from './core/core.module';
 import { NavigationService } from './core/services/navigation.service';
 import { FacebookLoginProvider, GoogleLoginProvider, SocialAuthServiceConfig } from '@abacritt/angularx-social-login';

@@ -1,0 +1,44 @@
+<mat-toolbar class="flex justify-content-between zindex toolbar-gradient">
+    <div class="flex align-items-center">
+      <button mat-icon-button [matMenuTriggerFor]="menu">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <mat-menu #menu="matMenu">
+        <button mat-menu-item routerLink="/admin/home">
+          <mat-icon >home</mat-icon>
+          <span>Inicio</span>
+        </button>
+        <button mat-menu-item routerLink="/admin/dashboard">
+          <mat-icon >schedule</mat-icon>
+          <span>Registro</span>
+        </button>
+        <button mat-menu-item routerLink="/admin/employees">
+          <mat-icon>person</mat-icon>
+          <span>Empleados</span>
+        </button>
+        <button mat-menu-item routerLink="/admin/attendance">
+          <mat-icon>event</mat-icon>
+          <span>Control Asistencia</span>
+        </button>
+        <button mat-menu-item routerLink="/admin/calendar">
+          <mat-icon>calendar_today</mat-icon>
+          <span>Calendario</span>
+        </button>
+        <button mat-menu-item routerLink="/admin/charts">
+          <mat-icon>bar_chart</mat-icon>
+          <span>Gráficas</span>
+        </button>
+        <button mat-menu-item routerLink="/admin/chatbot-config">
+          <mat-icon>upload</mat-icon>
+          <span>Chat Config</span>
+        </button>
+        <button mat-menu-item>
+          <mat-icon>settings</mat-icon>
+          <span>Configuración</span>
+        </button>
+      </mat-menu>
+    </div>
+    <button mat-button (click)="logout()">
+      Cerrar Sesión
+    </button>
+  </mat-toolbar>

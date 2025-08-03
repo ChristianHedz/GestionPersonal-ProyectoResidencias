@@ -1,0 +1,74 @@
+<ngx-spinner 
+  bdColor="rgba(33, 2, 64, 0.85)" 
+  size="medium" 
+  color="#FFD700" 
+  type="pacman" 
+  [fullScreen]="true">
+  <div class="spinner-content" style="text-align: center; width: 100%;">
+    <h3 style="color: white; font-family: 'Poppins', sans-serif; margin-top: 80px; text-align: center;">Procesando registro...</h3>
+    <p style="color: #f8c7ff; font-size: 14px; text-align: center;">Estamos enviando tu codigo QR</p>
+  </div>
+</ngx-spinner>
+<div class="surface-ground flex align-items-center justify-content-center min-h-screen bp">
+  <div class="grid w-full max-w-5xl shadow-3 border-round overflow-hidden md:w-9">
+    <div class="col-12 md:col-5 lg:col-6 flex flex-column align-items-center justify-content-center text-center p-4 text-white bg">
+      <div class="mt-2 text-center">
+        <img src="assets/img/logo.webp" alt="Rocket illustration" class="max-w-full">
+      </div>
+    </div>
+    <div class="col-12 md:col-7 lg:col-6 text-white p-4" style="background-color: #210240; color: white;">
+      <div class="flex flex-column">
+          <div class="mb-2 text-3xl text-center">
+              <span class="icon">&#x2618; Pasteleria Primavera </span>
+          </div>
+          <form class="flex flex-column justify-content-center" [formGroup]="registerForm">
+              <div class="mb-1">
+                <mat-form-field appearance="outline" class="w-full mb-2 mt-3">
+                  <mat-label>Ingresa tu nombre completo</mat-label>
+                  <input matInput type="text" formControlName="fullName">
+                  <mat-error *ngIf="fullName().errors">{{ getFieldError('fullName') }}</mat-error>
+                </mat-form-field>
+              </div>
+              
+              <div class="mb-1">
+                <mat-form-field appearance="outline" class="w-full mb-2">
+                  <mat-label>Ingresa tu Correo</mat-label>
+                  <input matInput type="email" formControlName="email">
+                  <mat-error *ngIf="email().errors">{{ getFieldError('email') }}</mat-error>
+                </mat-form-field>
+              </div>
+              
+              <div class="mb-1">
+                <mat-form-field appearance="outline" class="w-full mb-2">
+                  <mat-label>Ingresa tu contraseña</mat-label>
+                  <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password">
+                  <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button">
+                    <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+                  </button>
+                  <mat-error *ngIf="password().errors">{{ getFieldError('password') }}</mat-error>
+                </mat-form-field>
+              </div>
+              
+              <button mat-raised-button color="primary" class="w-full p-2 mb-3" (click)="register()">
+                Registrarse
+              </button>
+              
+              <!-- Separador "o" -->
+              <div class="flex align-items-center justify-content-center mb-3 w-full">
+                <div class="surface-border border-1 border-top-1 border-300 flex-grow-1"></div>
+                <div class="px-2 text-white font-light text-xs">o</div>
+                <div class="surface-border border-1 border-top-1 border-300 flex-grow-1"></div>
+              </div>
+                      
+              <!-- Botones de inicio de sesión con redes sociales -->
+              <app-social-login></app-social-login>
+              
+              <!-- Enlace para iniciar sesión -->
+              <div class="text-center text-white text-xs">
+                ¿Ya estás registrado? <a routerLink="/auth/login" class="text-blue-400">Inicia sesión</a>
+              </div>
+            </form>
+      </div>
+    </div>
+  </div>
+</div>
