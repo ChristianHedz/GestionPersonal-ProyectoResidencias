@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { RouterModule, RouterOutlet } from '@angular/router';
-import { AnimatedBackgroundComponent } from './shared/animated-background/animated-background.component';
 
 @Component({
   selector: 'app-root',

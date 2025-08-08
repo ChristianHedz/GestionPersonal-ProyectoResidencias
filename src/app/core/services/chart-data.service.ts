@@ -20,7 +20,7 @@ import { environment } from '../../../environments/environment';
 })
 export class ChartDataService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = environment.apiUrl;
+  private readonly baseUrl = environment.urlApi;
 
   // Helper function to get default date range (first day of month to current date)
   private getDefaultDateRange(): DateRange {
@@ -100,7 +100,7 @@ export class ChartDataService {
     const endDateFormatted = this.formatDate(range.endDate);
     
     return this.http.get<WorkedHoursResponse[]>(
-      `http://localhost:8081/api/v1/charts/worked-hours?startDate=${startDateFormatted}&endDate=${endDateFormatted}`
+      `${this.baseUrl}/charts/worked-hours?startDate=${startDateFormatted}&endDate=${endDateFormatted}`
     )
     .pipe(
       map(response => response.map(item => ({
@@ -117,7 +117,7 @@ export class ChartDataService {
    * @returns Observable with processed vacation data for each employee
    */
   getEmployeeVacations(): Observable<EmployeeVacationData[]> {
-    return this.http.get<AvailableVacationsResponse[]>('http://localhost:8081/api/v1/available-vacations')
+    return this.http.get<AvailableVacationsResponse[]>(`${this.baseUrl}/available-vacations`)
       .pipe(
         map(response => response.map(item => ({
           employeeName: item.fullName,
@@ -168,7 +168,7 @@ export class ChartDataService {
     const endDateFormatted = this.formatDate(range.endDate);
     
     return this.http.get<AttendanceStats[]>(
-      `http://localhost:8081/api/v1/charts?startDate=${startDateFormatted}&endDate=${endDateFormatted}`
+      `${this.baseUrl}/charts?startDate=${startDateFormatted}&endDate=${endDateFormatted}`
     );
   }
 
@@ -184,7 +184,7 @@ export class ChartDataService {
     const endDateFormatted = this.formatDate(range.endDate);
     
     return this.http.get<GeneralAttendanceStats>(
-      `http://localhost:8081/api/v1/charts/attendance-stats?startDate=${startDateFormatted}&endDate=${endDateFormatted}`
-    );
+      `${this.baseUrl}/charts/attendance-stats?startDate=${startDateFormatted}&endDate=${endDateFormatted}`
+    );  
   }
 }

@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@700;900&family=Open+Sans:wght@400;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap");
 
-html, body { height: 100%; }
+html, body { height: 100%; font-family: 'Inter', sans-serif; }
 body {
   margin: 0;
   font-family: "PT Sans", serif;
@@ -87,4 +88,17 @@ mat-dialog-title,
 .mat-mdc-dialog-title {
   background-color: transparent !important;
   color: white !important;
+}
+
+/* Estilos para snackbars de éxito y error */
+.success-snackbar {
+  --mdc-snackbar-container-color: #4caf50 !important;
+  --mat-snack-bar-button-color: #ffffff !important;
+  --mdc-snackbar-supporting-text-color: #ffffff !important;
+}
+
+.error-snackbar {
+  --mdc-snackbar-container-color: #f44336 !important;
+  --mat-snack-bar-button-color: #ffffff !important;
+  --mdc-snackbar-supporting-text-color: #ffffff !important;
 }

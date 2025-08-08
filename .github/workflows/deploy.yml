@@ -1,0 +1,90 @@
+name: Deploy Angular to S3 + CloudFront
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: true
+
+env:
+  AWS_REGION: us-east-1
+  S3_BUCKET: gestion-personal-frontend-prod-spa
+  CLOUDFRONT_DISTRIBUTION_ID: EIHJ726VN3ZI2
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Angular (production)
+        run: npm run build -- --configuration production
+
+      - name: Configure AWS credentials (static keys)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Validate required env vars
+        run: |
+          test -n "$S3_BUCKET" || (echo "S3_BUCKET no definido" && exit 1)
+          test -n "$CLOUDFRONT_DISTRIBUTION_ID" || (echo "CLOUDFRONT_DISTRIBUTION_ID no definido" && exit 1)
+
+      - name: Resolve dist path
+        id: distpath
+        shell: bash
+        run: |
+          set -euo pipefail
+          DIST_ROOT="dist"
+          if [ ! -d "$DIST_ROOT" ]; then
+            echo "No existe ./dist después del build" >&2
+            ls -la
+            exit 1
+          fi
+          COUNT=$(find "$DIST_ROOT" -maxdepth 1 -mindepth 1 -type d | wc -l)
+          if [ "$COUNT" -eq 1 ]; then
+            DIST_PATH=$(find "$DIST_ROOT" -maxdepth 1 -mindepth 1 -type d)
+          else
+            DIST_PATH="$DIST_ROOT"
+          fi
+          echo "DIST_PATH=$DIST_PATH" >> "$GITHUB_ENV"
+          echo "Usando DIST_PATH=$DIST_PATH"
+
+      - name: Sync assets to S3 (long cache)
+        run: |
+          aws s3 sync "$DIST_PATH" s3://$S3_BUCKET \
+            --delete \
+            --exclude "index.html" \
+            --cache-control "public,max-age=31536000,immutable"
+
+      - name: Upload index.html (no-cache)
+        run: |
+          aws s3 cp "$DIST_PATH/index.html" s3://$S3_BUCKET/index.html \
+            --cache-control "no-cache, no-store, must-revalidate" \
+            --metadata-directive REPLACE
+
+      - name: Invalidate CloudFront (index.html)
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id $CLOUDFRONT_DISTRIBUTION_ID \
+            --paths "/index.html"
+
+
