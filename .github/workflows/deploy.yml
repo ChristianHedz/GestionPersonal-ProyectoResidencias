@@ -65,6 +65,16 @@ jobs:
           else
             DIST_PATH="$DIST_ROOT"
           fi
+          # Angular builder "application" (v16+) suele generar carpeta "browser" dentro del proyecto
+          if [ -d "$DIST_PATH/browser" ]; then
+            DIST_PATH="$DIST_PATH/browser"
+          fi
+          # Verifica dónde vive index.html realmente
+          if [ ! -f "$DIST_PATH/index.html" ]; then
+            echo "No se encontró index.html en $DIST_PATH" >&2
+            find "$DIST_ROOT" -name index.html -maxdepth 3 -print || true
+            exit 1
+          fi
           echo "DIST_PATH=$DIST_PATH" >> "$GITHUB_ENV"
           echo "Usando DIST_PATH=$DIST_PATH"
 
