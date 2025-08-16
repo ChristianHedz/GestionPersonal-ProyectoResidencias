@@ -56,9 +56,9 @@
           <button type="button" mat-stroked-button color="warn" class="mr-2" (click)="resetFilters()" aria-label="Limpiar filtros">
             <mat-icon>clear</mat-icon> Limpiar
           </button>
-          <button type="button" mat-stroked-button color="accent" class="mr-2" (click)="exportToExcel()" [disabled]="loading() || attendanceData().length === 0" aria-label="Exportar a Excel">
+          <!-- <button type="button" mat-stroked-button color="accent" class="mr-2" (click)="exportToExcel()" [disabled]="loading() || attendanceData().length === 0" aria-label="Exportar a Excel">
             <mat-icon>description</mat-icon> Exportar a Excel
-          </button>
+          </button> -->
           <button type="submit" mat-raised-button color="primary" [disabled]="loading()" aria-label="Aplicar filtros">
             <mat-icon>search</mat-icon> Filtrar
           </button>

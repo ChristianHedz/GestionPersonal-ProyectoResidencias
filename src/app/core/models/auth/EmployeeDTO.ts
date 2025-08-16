@@ -5,4 +5,5 @@ export interface EmployeeDTO {
     phone: string;
     photo: string;
     status: string;
+    password?: string; // Campo opcional para editar contraseña
 }

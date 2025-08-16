@@ -68,7 +68,7 @@
         </div>
       </mat-tab>
       
-      <!-- Tab 2: Photo Management -->
+            <!-- Tab 2: Photo Management -->
       <mat-tab label="Foto de Perfil">
         <div class="p-4 text-center">
           <h3 class="text-lg font-semibold mb-4 text-600">Gestión de Foto de Perfil</h3>
@@ -85,13 +85,37 @@
             <mat-form-field appearance="outline" class="w-full">
               <mat-label>URL de Foto (Alternativo)</mat-label>
                              <input matInput 
-                      [value]="currentPhotoUrl || ''" 
-                      (input)="onPhotoUrlInput($event)"
-                      placeholder="https://ejemplo.com/foto.jpg">
+                     [value]="currentPhotoUrl || ''" 
+                     (input)="onPhotoUrlInput($event)"
+                     placeholder="https://ejemplo.com/foto.jpg">
               <mat-icon matSuffix>link</mat-icon>
               <mat-hint>También puedes pegar directamente una URL de imagen</mat-hint>
             </mat-form-field>
           </div>
+        </div>
+      </mat-tab>
+
+      <!-- Tab 3: Password Change -->
+      <mat-tab label="Cambiar Contraseña">
+        <div class="p-4">
+          <h3 class="text-lg font-semibold mb-4 text-600">Cambio de Contraseña</h3>
+          <div class="mb-3 p-3 border-round bg-yellow-50 text-yellow-800 text-sm">
+            <mat-icon class="vertical-align-middle mr-2" style="font-size: 18px; height: 18px; width: 18px;">info</mat-icon>
+            Deja este campo vacío si no deseas cambiar la contraseña del empleado.
+          </div>
+          
+          <form [formGroup]="employeeForm">
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Nueva Contraseña</mat-label>
+              <input matInput formControlName="password" type="password" 
+                     placeholder="Mínimo 6 caracteres">
+              <mat-icon matSuffix>lock</mat-icon>
+              <mat-hint>La contraseña debe tener al menos 6 caracteres</mat-hint>
+              <mat-error *ngIf="employeeForm.get('password')?.errors">
+                {{ getFieldError('password') }}
+              </mat-error>
+            </mat-form-field>
+          </form>
         </div>
       </mat-tab>
       

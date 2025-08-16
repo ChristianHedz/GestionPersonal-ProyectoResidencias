@@ -1,0 +1,54 @@
+<div class="employee-edit-dialog">
+  <h2 mat-dialog-title class="dialog-title">
+    <mat-icon class="title-icon">edit</mat-icon>
+    Editar Información Personal
+  </h2>
+  
+  <mat-dialog-content class="dialog-content">
+    <form [formGroup]="editForm" class="edit-form">
+      
+      <!-- Nombre completo -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Nombre Completo</mat-label>
+        <input matInput formControlName="fullName" placeholder="Ingrese su nombre completo">
+        <mat-icon matSuffix>person</mat-icon>
+        <mat-error *ngIf="editForm.get('fullName')?.invalid && editForm.get('fullName')?.touched">
+          {{ getErrorMessage('fullName') }}
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Email -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Email</mat-label>
+        <input matInput formControlName="email" type="email" placeholder="correo@ejemplo.com">
+        <mat-icon matSuffix>email</mat-icon>
+        <mat-error *ngIf="editForm.get('email')?.invalid && editForm.get('email')?.touched">
+          {{ getErrorMessage('email') }}
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Teléfono -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Teléfono</mat-label>
+        <input matInput formControlName="phone" placeholder="Ingrese su número de teléfono">
+        <mat-icon matSuffix>phone</mat-icon>
+        <mat-error *ngIf="editForm.get('phone')?.invalid && editForm.get('phone')?.touched">
+          {{ getErrorMessage('phone') }}
+        </mat-error>
+      </mat-form-field>
+
+    </form>
+  </mat-dialog-content>
+  
+  <mat-dialog-actions class="dialog-actions">
+    <button mat-stroked-button (click)="onCancel()" [disabled]="isLoading">
+      <mat-icon>close</mat-icon>
+      Cancelar
+    </button>
+    <button mat-raised-button color="primary" (click)="onSave()" [disabled]="isLoading || editForm.invalid">
+      <mat-icon *ngIf="!isLoading">save</mat-icon>
+      <mat-icon *ngIf="isLoading" class="spinning">hourglass_empty</mat-icon>
+      {{ isLoading ? 'Guardando...' : 'Guardar Cambios' }}
+    </button>
+  </mat-dialog-actions>
+</div>

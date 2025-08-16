@@ -49,7 +49,8 @@ export class EmployeeEditDialogComponent implements OnInit {
     email: ['', [Validators.required, Validators.pattern(this.validatorsService.emailPattern)]],
     phone: ['',[Validators.pattern(this.validatorsService.phonePattern)]],
     photo: [''],
-    status: ['ACTIVO', [Validators.required]]
+    status: ['ACTIVO', [Validators.required]],
+    password: ['', [Validators.minLength(6)]] // Campo opcional para cambiar contraseña
   });
   
   ngOnInit(): void {
@@ -93,6 +94,12 @@ export class EmployeeEditDialogComponent implements OnInit {
       status: this.employeeForm.get('status')?.value || 'ACTIVO'
     };
 
+    // Incluir password solo si se proporcionó
+    const passwordValue = this.employeeForm.get('password')?.value;
+    if (passwordValue && passwordValue.trim() !== '') {
+      updatedEmployee.password = passwordValue;
+    }
+
     this.employeesService.updateEmployee(this.data.employee.id, updatedEmployee)
       .subscribe({
         next: (response) => {
@@ -114,6 +121,10 @@ export class EmployeeEditDialogComponent implements OnInit {
     if (!control || !control.errors || !control.touched) return null;
     
     if (control.errors['required']) return 'Este campo es requerido';
+    if (control.errors['minlength']) {
+      if (field === 'password') return 'La contraseña debe tener al menos 6 caracteres';
+      return 'El valor es muy corto';
+    }
     if (control.errors['pattern']) {
       if (field === 'email') return 'Ingresa un correo electrónico válido';
       if (field === 'phone') return 'Ingresa un número de teléfono válido';
