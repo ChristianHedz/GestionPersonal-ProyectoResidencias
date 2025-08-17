@@ -17,6 +17,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ChatbotService, ChatbotDocument } from '../../../../core/services/chatbot.service';
 import { finalize } from 'rxjs';
 import { ToolbarComponent } from '../../../../shared/components/toolbar/toolbar.component';
+import { ChatbotBubbleComponent } from '../../../../shared/components/chatbot-bubble/chatbot-bubble.component';
 
 @Component({
   selector: 'app-chatbot-config',
@@ -37,6 +38,7 @@ import { ToolbarComponent } from '../../../../shared/components/toolbar/toolbar.
     MatChipsModule,
     MatProgressSpinnerModule,
     ToolbarComponent,
+    ChatbotBubbleComponent
   ],
   templateUrl: './chatbot-config.component.html',
   styleUrl: './chatbot-config.component.css'
